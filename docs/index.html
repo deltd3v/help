@@ -1,0 +1,1060 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>help — a peer network for people who need people</title>
+<meta name="description" content="A nostr-powered directory of people nearby, by country and language, who are around and willing to help. No backend to trust — just signed messages between people." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,500;9..144,600&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #0f1620; --bg-elevated: #131c28; --card: #1a2434;
+    --card-border: rgba(237,234,226,0.08); --text: #edeae2;
+    --text-muted: #93a4b8; --accent: #f2a93b; --accent-dim: #c6842a;
+    --active: #5fa88c; --inactive: #4a5568; --danger: #e08585;
+    --serif: 'Fraunces', serif; --sans: 'Inter', sans-serif;
+    --mono: 'IBM Plex Mono', monospace; --max: 880px;
+    --ease: cubic-bezier(.16,.84,.44,1);
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0; background:var(--bg); color:var(--text);
+    font-family:var(--sans); line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:var(--accent); text-decoration:none;}
+  a:hover{text-decoration:underline;}
+  .wrap{max-width:var(--max); margin:0 auto; padding:0 24px;}
+  section{padding:88px 0;}
+  @media (max-width:640px){ section{padding:56px 0;} }
+
+  nav{
+    position:sticky; top:0; z-index:20;
+    background:rgba(15,22,32,0.85);
+    backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--card-border);
+  }
+  nav .wrap{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:16px 24px;
+  }
+  .brand{font-family:var(--mono); font-size:15px; letter-spacing:0.02em; color:var(--text);}
+  .brand .dot{color:var(--active);}
+  nav .links{display:flex; align-items:center; gap:20px; font-size:14px;}
+  nav .links a{color:var(--text-muted); cursor:pointer;}
+  nav .links a:hover{color:var(--accent);}
+  .nav-btn{
+    background:transparent; border:1px solid var(--card-border); color:var(--text);
+    padding:8px 16px; border-radius:7px; font-size:13px; font-weight:600; cursor:pointer;
+    transition:all .3s var(--ease); font-family:var(--sans);
+  }
+  .nav-btn:hover{border-color:var(--accent); color:var(--accent); transform:scale(1.05);}
+
+  .hero{
+    position:relative; padding:120px 0 100px; overflow:hidden;
+    border-bottom:1px solid var(--card-border);
+  }
+  #pulse-field{position:absolute; inset:0; z-index:0; pointer-events:none;}
+  .pulse-dot{
+    position:absolute; width:6px; height:6px; border-radius:50%;
+    background:var(--inactive); animation:pulse 4s ease-in-out infinite;
+  }
+  @keyframes pulse{
+    0%,100%{ opacity:0.15; transform:scale(1); }
+    50%{ opacity:0.9; transform:scale(1.6); }
+  }
+  .hero .wrap{position:relative; z-index:1;}
+  .eyebrow{
+    font-family:var(--mono); font-size:13px; color:var(--accent);
+    text-transform:lowercase; letter-spacing:0.04em; margin-bottom:18px;
+  }
+  h1{
+    font-family:var(--serif); font-weight:600; font-size:clamp(40px,7vw,68px);
+    line-height:1.04; margin:0 0 22px; max-width:11ch;
+  }
+  .lede{
+    font-size:18px; color:var(--text-muted); max-width:52ch; margin:0 0 36px;
+  }
+  .cta-row{display:flex; gap:14px; flex-wrap:wrap;}
+  .btn{
+    font-family:var(--sans); font-weight:600; font-size:15px;
+    padding:13px 24px; border-radius:8px; border:1px solid transparent;
+    cursor:pointer; display:inline-block; position:relative; overflow:hidden;
+    transition:transform .25s var(--ease), box-shadow .25s var(--ease);
+  }
+  .btn:active{transform:scale(.96);}
+  .btn-primary{background:var(--accent); color:#1a1206;}
+  .btn-primary:hover{background:#ffbd5c; text-decoration:none; box-shadow:0 8px 24px -8px rgba(242,169,59,.6); transform:translateY(-2px);}
+  .btn-ghost{background:transparent; border-color:var(--card-border); color:var(--text);}
+  .btn-ghost:hover{border-color:var(--accent); color:var(--accent); text-decoration:none; transform:translateY(-2px);}
+
+  .section-head{margin-bottom:44px; max-width:60ch;}
+  .section-head h2{
+    font-family:var(--serif); font-weight:600; font-size:clamp(28px,4vw,38px);
+    margin:10px 0 14px;
+  }
+  .section-head p{color:var(--text-muted); font-size:16px; margin:0;}
+
+  .peer-list{
+    display:flex; flex-direction:column; gap:1px;
+    background:var(--card-border); border:1px solid var(--card-border);
+    border-radius:12px; overflow:hidden;
+  }
+  .peer-card{
+    background:var(--card); padding:18px 20px;
+    display:grid; grid-template-columns:auto 1fr auto auto;
+    align-items:center; gap:16px; transition:background .25s;
+  }
+  .peer-card:hover{background:#202c40;}
+  @media (max-width:640px){
+    .peer-card{grid-template-columns:auto 1fr; row-gap:8px;}
+    .peer-card .score, .peer-card .seen{grid-column:2;}
+  }
+  .flag{font-size:22px; transition:transform .3s var(--ease);}
+  .peer-card:hover .flag{transform:scale(1.25) rotate(-6deg);}
+  .who .handle{font-family:var(--mono); font-size:15px; color:var(--text);}
+  .who .langs{font-size:13px; color:var(--text-muted); margin-top:2px;}
+  .score{font-family:var(--mono); font-size:13px; color:var(--text-muted); white-space:nowrap;}
+  .score b{color:var(--accent); font-weight:600;}
+  .seen{display:flex; align-items:center; gap:7px; font-size:13px; white-space:nowrap;}
+  .seen .led{width:7px; height:7px; border-radius:50%; display:inline-block;}
+  .seen.is-active .led{background:var(--active); box-shadow:0 0 8px var(--active);}
+  .seen.is-idle .led{background:var(--inactive);}
+  .seen.is-active{color:var(--active);}
+  .seen.is-idle{color:var(--text-muted);}
+
+  .steps{display:flex; flex-direction:column; gap:0;}
+  .step{
+    display:grid; grid-template-columns:56px 1fr; gap:20px;
+    padding:26px 0; border-top:1px solid var(--card-border);
+  }
+  .step:last-child{border-bottom:1px solid var(--card-border);}
+  .step-num{font-family:var(--mono); color:var(--accent-dim); font-size:14px; padding-top:3px;}
+  .step h3{font-family:var(--serif); font-weight:500; font-size:20px; margin:0 0 6px;}
+  .step p{color:var(--text-muted); margin:0; max-width:56ch;}
+
+  .card-panel{
+    background:var(--card); border:1px solid var(--card-border);
+    border-radius:14px; padding:36px;
+  }
+  label{display:block; font-size:13px; color:var(--text-muted); margin:0 0 6px;}
+  .field{margin-bottom:18px;}
+  .field-row{display:grid; grid-template-columns:1fr 1fr; gap:16px;}
+  @media (max-width:640px){.field-row{grid-template-columns:1fr;}}
+  input, textarea, select{
+    width:100%; background:var(--bg-elevated); border:1px solid var(--card-border);
+    color:var(--text); border-radius:8px; padding:11px 13px; font-family:var(--sans);
+    font-size:15px;
+  }
+  input:focus, textarea:focus, select:focus{
+    outline:2px solid var(--accent); outline-offset:1px; border-color:var(--accent);
+  }
+  textarea{resize:vertical; min-height:80px;}
+  .form-foot{
+    display:flex; align-items:center; justify-content:space-between; gap:16px;
+    margin-top:6px; flex-wrap:wrap;
+  }
+  .form-note{font-size:13px; color:var(--text-muted); margin:0;}
+  .form-status{font-size:14px; margin-top:14px;}
+  .form-status.ok{color:var(--active);}
+  .form-status.err{color:var(--danger);}
+
+  .support-grid{
+    display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:16px; margin-top:32px;
+  }
+  .support-item{
+    background:var(--card); border:1px solid var(--card-border); border-radius:12px;
+    padding:22px; transition:transform .3s var(--ease), border-color .3s;
+  }
+  .support-item:hover{transform:translateY(-4px); border-color:var(--accent-dim);}
+  .support-item .k{font-family:var(--mono); font-size:12px; color:var(--accent); display:block; margin-bottom:8px;}
+  .support-item .v{font-size:15px;}
+  .plea{
+    font-family:var(--serif); font-size:22px; font-weight:500; line-height:1.4;
+    max-width:44ch; margin:0 0 8px; color:var(--text);
+  }
+
+  footer{
+    border-top:1px solid var(--card-border);
+    padding:36px 0; font-size:13px; color:var(--text-muted);
+  }
+  footer .wrap{display:flex; justify-content:space-between; flex-wrap:wrap; gap:12px;}
+  .sr-only{
+    position:absolute; width:1px; height:1px; padding:0; margin:-1px;
+    overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0;
+  }
+
+  /* ===== GAME-LIKE MULTI-STEP MODAL ===== */
+  #modal-overlay{
+    position:fixed; inset:0; z-index:100;
+    background:rgba(9,13,19,.75);
+    backdrop-filter:blur(6px);
+    display:flex; align-items:center; justify-content:center;
+    opacity:0; pointer-events:none;
+    transition:opacity .5s var(--ease);
+  }
+  #modal-overlay.show{opacity:1; pointer-events:auto;}
+
+  #modal-container{
+    position:relative;
+    width:min(520px,calc(100vw - 40px));
+    max-height:min(700px,calc(100vh - 40px));
+    background:var(--bg-elevated);
+    border:1px solid var(--card-border);
+    border-radius:20px;
+    overflow:hidden;
+    transform:translateY(40px) scale(.92);
+    transition:transform .6s var(--ease), opacity .5s var(--ease);
+    opacity:0;
+    display:flex; flex-direction:column;
+    box-shadow:0 40px 80px -20px rgba(0,0,0,.7);
+  }
+  #modal-overlay.show #modal-container{
+    transform:translateY(0) scale(1);
+    opacity:1;
+  }
+
+  #modal-canvas{
+    position:absolute; inset:0; z-index:0;
+    pointer-events:none;
+    border-radius:20px;
+  }
+
+  .modal-head{
+    position:relative; z-index:1;
+    display:flex; align-items:center; justify-content:space-between;
+    padding:20px 24px 16px;
+    border-bottom:1px solid var(--card-border);
+    flex-shrink:0;
+  }
+  .modal-head h3{
+    font-family:var(--serif); font-size:20px; margin:0; font-weight:600;
+    display:flex; align-items:center; gap:10px;
+  }
+  .modal-head h3 .step-icon{
+    display:inline-flex; align-items:center; justify-content:center;
+    width:28px; height:28px; border-radius:50%;
+    background:var(--card); border:1px solid var(--card-border);
+    font-size:13px; font-family:var(--mono); color:var(--accent);
+    transition:all .4s var(--ease);
+  }
+  .modal-close{
+    background:none; border:none; color:var(--text-muted); font-size:24px;
+    cursor:pointer; width:36px; height:36px; border-radius:8px;
+    transition:all .3s var(--ease);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .modal-close:hover{background:rgba(255,255,255,.06); color:var(--text); transform:rotate(90deg);}
+
+  .modal-steps{
+    position:relative; z-index:1;
+    display:flex; gap:6px; padding:0 24px 12px; flex-shrink:0;
+  }
+  .ms-dot{
+    height:3px; flex:1; border-radius:99px;
+    background:var(--card-border); transition:all .4s var(--ease);
+    position:relative; overflow:hidden;
+  }
+  .ms-dot::after{
+    content:''; position:absolute; inset:0;
+    background:var(--accent); transform:scaleX(0); transform-origin:left;
+    transition:transform .6s var(--ease);
+  }
+  .ms-dot.done::after{transform:scaleX(1);}
+  .ms-dot.active{background:var(--accent-dim);}
+
+  .modal-body{
+    position:relative; z-index:1;
+    flex:1; overflow-y:auto; padding:24px;
+  }
+
+  .mv{
+    display:none;
+  }
+  .mv.active{
+    display:block;
+    animation:mvIn .5s var(--ease);
+  }
+  .mv.out{
+    display:block;
+    animation:mvOut .35s var(--ease) forwards;
+  }
+
+  @keyframes mvIn{
+    0%{ opacity:0; transform:translateX(30px) scale(.96); filter:blur(4px); }
+    100%{ opacity:1; transform:translateX(0) scale(1); filter:blur(0); }
+  }
+  @keyframes mvOut{
+    0%{ opacity:1; transform:translateX(0) scale(1); filter:blur(0); }
+    100%{ opacity:0; transform:translateX(-30px) scale(.96); filter:blur(4px); }
+  }
+
+  .mv-title{font-family:var(--serif); font-size:22px; margin:0 0 6px; font-weight:600;}
+  .mv-sub{color:var(--text-muted); font-size:14px; margin:0 0 20px;}
+
+  .modal-body .field{margin-bottom:14px;}
+  .modal-body .field-row{gap:12px; margin-bottom:0;}
+  .modal-body input{
+    background:var(--card); font-size:14px; padding:10px 12px;
+    transition:all .25s var(--ease);
+  }
+  .modal-body input:focus{
+    transform:scale(1.02);
+    box-shadow:0 0 20px -8px var(--accent);
+  }
+  .modal-body label{font-size:12px; margin-bottom:4px;}
+
+  .mv-btn{
+    width:100%; margin-top:4px; padding:12px; font-size:14px;
+    position:relative; overflow:hidden;
+  }
+  .mv-btn::before{
+    content:''; position:absolute; inset:0;
+    background:linear-gradient(90deg,transparent,rgba(255,255,255,.1),transparent);
+    transform:translateX(-100%);
+    transition:transform .5s;
+  }
+  .mv-btn:hover::before{transform:translateX(100%);}
+
+  .mv-links{
+    display:flex; justify-content:space-between; margin-top:14px;
+    font-size:13px; flex-wrap:wrap; gap:6px;
+  }
+  .mv-link{
+    background:none; border:none; color:var(--text-muted);
+    cursor:pointer; font-size:13px; padding:4px 0;
+    transition:color .25s, transform .3s var(--ease);
+    font-family:var(--sans);
+  }
+  .mv-link:hover{color:var(--accent); transform:translateX(3px);}
+
+  .mv-grid{
+    display:grid; grid-template-columns:1fr 1fr; gap:10px;
+  }
+  .mv-grid-3{grid-template-columns:1fr 1fr 1fr;}
+
+  .mv-card{
+    background:var(--card); border:1px solid var(--card-border);
+    border-radius:12px; padding:16px; cursor:pointer;
+    transition:all .3s var(--ease); text-align:center;
+    position:relative; overflow:hidden;
+  }
+  .mv-card:hover{
+    border-color:var(--accent); transform:translateY(-3px) scale(1.02);
+    box-shadow:0 8px 24px -12px rgba(242,169,59,.3);
+  }
+  .mv-card .mc-icon{font-size:28px; margin-bottom:8px; display:block;}
+  .mv-card .mc-label{font-size:13px; color:var(--text); font-family:var(--sans); font-weight:500;}
+  .mv-card .mc-desc{font-size:11px; color:var(--text-muted); margin-top:4px;}
+
+  .mv-card.lang-card{padding:12px;}
+  .mv-card.lang-card .mc-icon{font-size:24px; margin-bottom:4px;}
+  .mv-card.lang-card .mc-label{font-size:12px;}
+
+  .mv-card.font-card{padding:14px;}
+  .mv-card.font-card .mc-icon{font-size:18px; margin-bottom:4px; font-weight:600;}
+
+  .mv-card.theme-card{padding:14px;}
+  .mv-card.theme-card .mc-preview{
+    width:100%; height:40px; border-radius:6px; margin-bottom:8px;
+    border:1px solid var(--card-border);
+  }
+
+  .mv-card.selected{
+    border-color:var(--accent);
+    box-shadow:0 0 20px -8px var(--accent), inset 0 0 0 1px var(--accent);
+  }
+  .mv-card.selected::after{
+    content:'✓'; position:absolute; top:6px; right:8px;
+    font-size:11px; color:var(--accent); font-family:var(--mono);
+  }
+
+  .mv-text-block{
+    font-size:14px; color:var(--text-muted); line-height:1.7;
+    max-height:260px; overflow-y:auto; padding-right:8px;
+  }
+  .mv-text-block h4{
+    font-family:var(--serif); font-size:16px; color:var(--text); margin:16px 0 6px; font-weight:500;
+  }
+  .mv-text-block h4:first-child{margin-top:0;}
+  .mv-text-block p{margin:0 0 8px;}
+
+  .mv-faq-item{
+    border-bottom:1px solid var(--card-border); padding:10px 0; cursor:pointer;
+    transition:all .3s var(--ease);
+  }
+  .mv-faq-item:first-child{padding-top:0;}
+  .mv-faq-item .faq-q{
+    display:flex; justify-content:space-between; align-items:center;
+    font-size:14px; color:var(--text); font-weight:500;
+  }
+  .mv-faq-item .faq-q span{font-size:16px; transition:transform .3s;}
+  .mv-faq-item.open .faq-q span{transform:rotate(45deg);}
+  .mv-faq-item .faq-a{
+    font-size:13px; color:var(--text-muted); max-height:0; overflow:hidden;
+    transition:max-height .4s var(--ease), padding .4s;
+  }
+  .mv-faq-item.open .faq-a{
+    max-height:200px; padding-top:8px;
+  }
+
+  .cookie-prefs{display:flex; flex-direction:column; gap:10px; margin:14px 0;}
+  .pref-row{
+    display:flex; align-items:center; justify-content:space-between; gap:12px;
+    background:var(--card); padding:12px 14px; border-radius:10px;
+    border:1px solid var(--card-border);
+  }
+  .pref-row .pt{font-size:13px; color:var(--text);}
+  .pref-row .pd{font-size:11px; color:var(--text-muted); margin-top:2px;}
+
+  .switch{position:relative; width:38px; height:20px; flex-shrink:0;}
+  .switch input{opacity:0; width:100%; height:100%; margin:0; position:absolute; cursor:pointer; z-index:1;}
+  .switch .track{
+    position:absolute; inset:0; background:var(--card-border); border-radius:99px;
+    transition:background .3s var(--ease);
+  }
+  .switch .thumb{
+    position:absolute; top:2px; left:2px; width:16px; height:16px; border-radius:50%;
+    background:var(--text); transition:transform .3s var(--ease);
+  }
+  .switch input:checked + .track{background:var(--active);}
+  .switch input:checked + .track .thumb{transform:translateX(18px);}
+  .switch input:disabled + .track{background:var(--accent-dim); opacity:.6;}
+
+  .mv-back{
+    background:none; border:none; color:var(--text-muted);
+    cursor:pointer; font-size:13px; padding:6px 0; display:flex; align-items:center; gap:5px;
+    transition:color .25s, transform .3s var(--ease);
+    font-family:var(--sans);
+  }
+  .mv-back:hover{color:var(--accent); transform:translateX(-3px);}
+
+  .toast-container{
+    position:fixed; bottom:20px; right:20px; z-index:200;
+    display:flex; flex-direction:column; gap:8px;
+    width:min(320px,calc(100vw - 40px));
+  }
+  .toast{
+    background:var(--card); border:1px solid var(--card-border); border-radius:10px;
+    padding:12px 16px; display:flex; gap:8px; align-items:flex-start;
+    box-shadow:0 10px 30px -10px rgba(0,0,0,.5);
+    animation:toastIn .4s var(--ease); cursor:pointer;
+  }
+  .toast.out{animation:toastOut .3s var(--ease) forwards;}
+  @keyframes toastIn{
+    0%{ opacity:0; transform:translateX(40px) scale(.95); }
+    100%{ opacity:1; transform:translateX(0) scale(1); }
+  }
+  @keyframes toastOut{
+    100%{ opacity:0; transform:translateX(40px) scale(.95); }
+  }
+  .toast .tx{font-size:13px; color:var(--text); flex:1;}
+  .toast.success .tx{color:var(--active);}
+  .toast.error .tx{color:var(--danger);}
+
+  @media (prefers-reduced-motion: reduce){
+    .pulse-dot{animation:none; opacity:0.4;}
+    html{scroll-behavior:auto;}
+  }
+  @media (max-width:640px){
+    .mv-grid{grid-template-columns:1fr;}
+    .mv-grid-3{grid-template-columns:1fr 1fr;}
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <div class="brand">help<span class="dot">·</span>nostr</div>
+    <div class="links">
+      <a href="#how">how it works</a>
+      <a href="#join">early access</a>
+      <a href="#support">support</a>
+      <button class="nav-btn" id="open-auth">Sign in</button>
+    </div>
+  </div>
+</nav>
+
+<section class="hero">
+  <div id="pulse-field" aria-hidden="true"></div>
+  <div class="wrap">
+    <div class="eyebrow">an open peer network, powered by nostr</div>
+    <h1>We all need help.</h1>
+    <p class="lede">
+      A lightweight, nostr-powered way to find people near you — by country and language — who
+      are around and willing to help. No company behind it, no database to trust. Just people,
+      signed by their own keys.
+    </p>
+    <div class="cta-row">
+      <a class="btn btn-primary" href="#join">Get early access</a>
+      <a class="btn btn-ghost" href="#support">Support the project</a>
+    </div>
+  </div>
+</section>
+
+<section id="what">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="eyebrow">what it looks like</div>
+      <h2>A list of people, not a platform</h2>
+      <p>Every entry below is a person, not an account row in someone's database. Their handle,
+        languages, and helper score all live in their own nostr identity — this page just
+        renders it.</p>
+    </div>
+    <div class="peer-list">
+      <div class="peer-card">
+        <span class="flag">🇫🇮</span>
+        <span class="who"><span class="handle">@kalle_hp</span><div class="langs">Finnish, English</div></span>
+        <span class="score">helper score <b>42</b></span>
+        <span class="seen is-active"><span class="led"></span>active now</span>
+      </div>
+      <div class="peer-card">
+        <span class="flag">🇧🇷</span>
+        <span class="who"><span class="handle">@thiago_help</span><div class="langs">Portuguese, English</div></span>
+        <span class="score">helper score <b>65</b></span>
+        <span class="seen is-active"><span class="led"></span>active now</span>
+      </div>
+      <div class="peer-card">
+        <span class="flag">🇩🇪</span>
+        <span class="who"><span class="handle">@lena.codes</span><div class="langs">German, English</div></span>
+        <span class="score">helper score <b>18</b></span>
+        <span class="seen is-idle"><span class="led"></span>active 2h ago</span>
+      </div>
+      <div class="peer-card">
+        <span class="flag">🇯🇵</span>
+        <span class="who"><span class="handle">@haru_ns</span><div class="langs">Japanese</div></span>
+        <span class="score">helper score <b>7</b></span>
+        <span class="seen is-idle"><span class="led"></span>active 3d ago</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="how">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="eyebrow">how it works</div>
+      <h2>Three things happen, in order</h2>
+      <p>There's no sign-up flow to design around — just a key you hold, a place you're from,
+        and a way to be found.</p>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">01</div>
+        <div><h3>Pick a handle</h3>
+          <p>Choose a name. Behind it, a nostr keypair is generated and held only by you —
+            there's no password of ours to leak, because we never have one.</p></div>
+      </div>
+      <div class="step">
+        <div class="step-num">02</div>
+        <div><h3>Get discovered nearby</h3>
+          <p>Set your country and language once. Anyone nearby can see that you're around and
+            willing to help, without you exposing anything else about yourself.</p></div>
+      </div>
+      <div class="step">
+        <div class="step-num">03</div>
+        <div><h3>Give or ask for help</h3>
+          <p>Leave someone a message directly, or post to the open forum — visible to your
+            local area, your region, or the whole world, your choice. Every post is signed by
+            nostr, not stored by us.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="join">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="eyebrow">early access</div>
+      <h2>Be one of the first peers</h2>
+      <p>Leave your details and I'll reach out when there's something to try. This is day one —
+        the form below is genuinely how I'll know anyone wants this.</p>
+    </div>
+    <div class="card-panel">
+      <form id="join-form" action="https://formspree.io/f/YOUR_FORM_ID" method="POST">
+        <div class="field-row">
+          <div class="field">
+            <label for="handle">What handle would you want? *</label>
+            <input type="text" id="handle" name="handle" placeholder="e.g. kalle_hp" required>
+          </div>
+          <div class="field">
+            <label for="country">Country *</label>
+            <input type="text" id="country" name="country" placeholder="e.g. Finland" required>
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label for="language">Language(s)</label>
+            <input type="text" id="language" name="language" placeholder="e.g. Finnish, English">
+          </div>
+          <div class="field">
+            <label for="email">Email <span style="opacity:0.6;">(optional, for updates)</span></label>
+            <input type="email" id="email" name="email" placeholder="you@example.com">
+          </div>
+        </div>
+        <div class="field">
+          <label for="note">What kind of help are you drawn to — giving, receiving, or both?</label>
+          <textarea id="note" name="note" placeholder="A sentence or two is plenty."></textarea>
+        </div>
+        <div class="form-foot">
+          <p class="form-note">No password, no account. This just tells me you exist.</p>
+          <button type="submit" class="btn btn-primary">Request early access</button>
+        </div>
+        <p class="form-status" id="form-status" role="status"></p>
+      </form>
+    </div>
+  </div>
+</section>
+
+<section id="support">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="eyebrow">support</div>
+      <h2>This is a solo, unfunded project</h2>
+    </div>
+    <p class="plea">I'm building this alone, on my own time, with no funding behind it. If the
+      idea is worth something to you, a small donation keeps it alive — and every bit goes
+      straight back into building.</p>
+    <div class="support-grid">
+      <div class="support-item">
+        <span class="k">Ko-fi</span>
+        <span class="v"><a href="#" id="link-kofi">ko-fi.com/YOUR_HANDLE</a></span>
+      </div>
+      <div class="support-item">
+        <span class="k">GitHub Sponsors</span>
+        <span class="v"><a href="#" id="link-ghsponsors">github.com/sponsors/YOUR_HANDLE</a></span>
+      </div>
+      <div class="support-item">
+        <span class="k">Lightning / nostr zap</span>
+        <span class="v" id="link-lightning">yourname@getalby.com</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div>help — built in the open, one day at a time.</div>
+    <div><a href="https://github.com/YOUR_GH_USERNAME/help" id="link-repo">source on GitHub</a></div>
+  </div>
+</footer>
+
+<!-- ===== GAME MULTI-STEP MODAL ===== -->
+<div id="modal-overlay">
+  <div id="modal-container">
+    <canvas id="modal-canvas"></canvas>
+    <div class="modal-head">
+      <h3><span class="step-icon" id="step-icon">1</span><span id="modal-title">Sign in</span></h3>
+      <button class="modal-close" id="modal-close">&times;</button>
+    </div>
+    <div class="modal-steps" id="modal-steps"></div>
+    <div class="modal-body" id="modal-body">
+
+      <!-- SIGN IN -->
+      <div class="mv" data-view="signin">
+        <p class="mv-title">Welcome back</p>
+        <p class="mv-sub">Sign in with your handle.</p>
+        <div class="field"><label>Handle</label><input type="text" placeholder="e.g. kalle_hp" id="si-handle"></div>
+        <div class="field"><label>Password</label><input type="password" placeholder="••••••••" id="si-pass"></div>
+        <button class="btn btn-primary mv-btn" data-action="signin">Sign in</button>
+        <div class="mv-links">
+          <button class="mv-link" data-go="forgot-pass">Forgot password</button>
+          <button class="mv-link" data-go="forgot-user">Forgot username</button>
+          <button class="mv-link" data-go="signup">Need a handle?</button>
+        </div>
+      </div>
+
+      <!-- SIGN UP -->
+      <div class="mv" data-view="signup">
+        <p class="mv-title">Create your handle</p>
+        <p class="mv-sub">Generate a nostr keypair. We never see your key.</p>
+        <div class="field"><label>Handle</label><input type="text" placeholder="kalle_hp" id="su-handle"></div>
+        <div class="field-row">
+          <div class="field"><label>Country</label><input type="text" placeholder="Finland" id="su-country"></div>
+          <div class="field"><label>Language(s)</label><input type="text" placeholder="Finnish, English" id="su-lang"></div>
+        </div>
+        <div class="field"><label>Email<span style="opacity:.6;"> (optional)</span></label><input type="email" placeholder="you@example.com" id="su-email"></div>
+        <div class="field"><label>Password</label><input type="password" placeholder="min. 8 chars" id="su-pass"></div>
+        <button class="btn btn-primary mv-btn" data-action="signup">Create handle</button>
+        <div class="mv-links">
+          <button class="mv-link" data-go="signin">Already have a handle?</button>
+        </div>
+      </div>
+
+      <!-- FORGOT PASSWORD -->
+      <div class="mv" data-view="forgot-pass">
+        <p class="mv-title">Reset password</p>
+        <p class="mv-sub">Enter your handle or email for a reset link.</p>
+        <div class="field"><label>Handle or email</label><input type="text" placeholder="kalle_hp or you@example.com" id="fg-id"></div>
+        <button class="btn btn-primary mv-btn" data-action="forgot-pass">Send reset link</button>
+        <div class="mv-links">
+          <button class="mv-link" data-go="signin">&larr; Back to sign in</button>
+        </div>
+      </div>
+
+      <!-- FORGOT USERNAME -->
+      <div class="mv" data-view="forgot-user">
+        <p class="mv-title">Forgot username</p>
+        <p class="mv-sub">Enter your email to recover your handle.</p>
+        <div class="field"><label>Email</label><input type="email" placeholder="you@example.com" id="fu-email"></div>
+        <button class="btn btn-primary mv-btn" data-action="forgot-user">Send username</button>
+        <div class="mv-links">
+          <button class="mv-link" data-go="signin">&larr; Back to sign in</button>
+        </div>
+      </div>
+
+      <!-- SETTINGS MENU -->
+      <div class="mv" data-view="settings">
+        <p class="mv-title">Settings</p>
+        <p class="mv-sub">Customize your experience.</p>
+        <div class="mv-grid mv-grid-3" style="margin-top:8px;">
+          <div class="mv-card" data-go="theme"><span class="mc-icon">🎨</span><div class="mc-label">Theme</div><div class="mc-desc">Colors &amp; mode</div></div>
+          <div class="mv-card" data-go="font"><span class="mc-icon">Aa</span><div class="mc-label">Font</div><div class="mc-desc">Typeface</div></div>
+          <div class="mv-card" data-go="lang"><span class="mc-icon">🌐</span><div class="mc-label">Language</div><div class="mc-desc">i18n</div></div>
+          <div class="mv-card" data-go="faq"><span class="mc-icon">❓</span><div class="mc-label">FAQ</div><div class="mc-desc">Help</div></div>
+          <div class="mv-card" data-go="tos"><span class="mc-icon">📜</span><div class="mc-label">Terms</div><div class="mc-desc">ToS</div></div>
+          <div class="mv-card" data-go="cookie"><span class="mc-icon">🍪</span><div class="mc-label">Cookies</div><div class="mc-desc">Privacy</div></div>
+        </div>
+        <div class="mv-links" style="margin-top:16px;">
+          <button class="mv-link" data-go="signin">&larr; Back</button>
+        </div>
+      </div>
+
+      <!-- THEME -->
+      <div class="mv" data-view="theme">
+        <p class="mv-title">Choose theme</p>
+        <p class="mv-sub">Pick a visual style for this site.</p>
+        <div class="mv-grid">
+          <div class="mv-card theme-card" data-theme="dark"><div class="mc-preview" style="background:#0f1620;"></div><div class="mc-label">Dark</div><div class="mc-desc">Default night mode</div></div>
+          <div class="mv-card theme-card" data-theme="dim"><div class="mc-preview" style="background:#1a2434;"></div><div class="mc-label">Dim</div><div class="mc-desc">Soft dark</div></div>
+          <div class="mv-card theme-card" data-theme="light"><div class="mc-preview" style="background:#f5f0e8;border-color:#d4cfc4;"></div><div class="mc-label">Light</div><div class="mc-desc">Daylight</div></div>
+          <div class="mv-card theme-card" data-theme="cyber"><div class="mc-preview" style="background:#0a0f1a;border-color:#00ff88;"></div><div class="mc-label">Cyber</div><div class="mc-desc">Neon glow</div></div>
+        </div>
+        <div class="mv-links" style="margin-top:12px;">
+          <button class="mv-link" data-go="settings">&larr; Settings</button>
+        </div>
+      </div>
+
+      <!-- FONT -->
+      <div class="mv" data-view="font">
+        <p class="mv-title">Font picker</p>
+        <p class="mv-sub">Choose your reading typeface.</p>
+        <div class="mv-grid">
+          <div class="mv-card font-card" data-font="Inter"><div class="mc-icon" style="font-family:'Inter';">Aa</div><div class="mc-label">Inter</div><div class="mc-desc">Sans-serif</div></div>
+          <div class="mv-card font-card" data-font="Fraunces"><div class="mc-icon" style="font-family:'Fraunces';">Aa</div><div class="mc-label">Fraunces</div><div class="mc-desc">Serif</div></div>
+          <div class="mv-card font-card" data-font="IBM Plex Mono"><div class="mc-icon" style="font-family:'IBM Plex Mono';">Aa</div><div class="mc-label">IBM Mono</div><div class="mc-desc">Monospace</div></div>
+          <div class="mv-card font-card" data-font="Georgia"><div class="mc-icon" style="font-family:Georgia;">Aa</div><div class="mc-label">Georgia</div><div class="mc-desc">Classic serif</div></div>
+        </div>
+        <div class="mv-links" style="margin-top:12px;">
+          <button class="mv-link" data-go="settings">&larr; Settings</button>
+        </div>
+      </div>
+
+      <!-- LANGUAGE / i18n -->
+      <div class="mv" data-view="lang">
+        <p class="mv-title">Language</p>
+        <p class="mv-sub">Choose your interface language.</p>
+        <div class="mv-grid">
+          <div class="mv-card lang-card" data-lang="en"><span class="mc-icon" style="font-size:28px;">🇬🇧</span><div class="mc-label">English</div></div>
+          <div class="mv-card lang-card" data-lang="fi"><span class="mc-icon" style="font-size:28px;">🇫🇮</span><div class="mc-label">Suomi</div></div>
+          <div class="mv-card lang-card" data-lang="pt"><span class="mc-icon" style="font-size:28px;">🇧🇷</span><div class="mc-label">Português</div></div>
+          <div class="mv-card lang-card" data-lang="de"><span class="mc-icon" style="font-size:28px;">🇩🇪</span><div class="mc-label">Deutsch</div></div>
+          <div class="mv-card lang-card" data-lang="ja"><span class="mc-icon" style="font-size:28px;">🇯🇵</span><div class="mc-label">日本語</div></div>
+          <div class="mv-card lang-card" data-lang="es"><span class="mc-icon" style="font-size:28px;">🇪🇸</span><div class="mc-label">Español</div></div>
+        </div>
+        <div class="mv-links" style="margin-top:12px;">
+          <button class="mv-link" data-go="settings">&larr; Settings</button>
+        </div>
+      </div>
+
+      <!-- FAQ -->
+      <div class="mv" data-view="faq">
+        <p class="mv-title">Frequently asked questions</p>
+        <p class="mv-sub">Everything you need to know.</p>
+        <div class="mv-text-block">
+          <div class="mv-faq-item"><div class="faq-q">What is a nostr keypair?<span>+</span></div><div class="faq-a">A cryptographic key pair — a private key (secret) and a public key (handle). Your identity is yours alone; we never see your private key.</div></div>
+          <div class="mv-faq-item"><div class="faq-q">Is this free?<span>+</span></div><div class="faq-a">Yes. This is a solo, unfunded project built in public. If it's useful, donations help keep it alive.</div></div>
+          <div class="mv-faq-item"><div class="faq-q">How do I reset my password?<span>+</span></div><div class="faq-a">Use the "Forgot password" option in the sign-in view. A reset link will be sent to your email.</div></div>
+          <div class="mv-faq-item"><div class="faq-q">What data do you store?<span>+</span></div><div class="faq-a">Nothing server-side. Your handle, language, and presence live in your nostr identity. We only store consent preferences locally in your browser.</div></div>
+          <div class="mv-faq-item"><div class="faq-q">Can I change my handle later?<span>+</span></div><div class="faq-a">Not yet — handles are tied to the nostr keypair generated on sign-up. A migration feature is planned.</div></div>
+        </div>
+        <div class="mv-links" style="margin-top:12px;">
+          <button class="mv-link" data-go="settings">&larr; Settings</button>
+        </div>
+      </div>
+
+      <!-- TERMS OF SERVICE -->
+      <div class="mv" data-view="tos">
+        <p class="mv-title">Terms of Service</p>
+        <p class="mv-sub">Last updated: July 2, 2026</p>
+        <div class="mv-text-block">
+          <h4>1. No Backend, No Liability</h4><p>This project operates without a backend. Your identity is your nostr keypair generated in your browser. We do not store, process, or transmit your data on our servers. Use at your own risk.</p>
+          <h4>2. Open Source</h4><p>The source code is available on GitHub under the MIT license. You are free to inspect, fork, and contribute.</p>
+          <h4>3. Donations</h4><p>Donations are voluntary and non-refundable. They support the solo developer behind this project.</p>
+          <h4>4. No Warranty</h4><p>This software is provided "as is" without warranty of any kind. The developer is not responsible for any damages arising from its use.</p>
+          <h4>5. Privacy</h4><p>We do not track you. No analytics, no cookies (except for local consent storage). See the Cookie settings for details.</p>
+        </div>
+        <div class="mv-links" style="margin-top:12px;">
+          <button class="mv-link" data-go="settings">&larr; Settings</button>
+        </div>
+      </div>
+
+      <!-- COOKIE CONSENT -->
+      <div class="mv" data-view="cookie">
+        <p class="mv-title">Cookie &amp; privacy preferences</p>
+        <p class="mv-sub">This site stores small bits in your browser. No third-party cookies.</p>
+        <div class="cookie-prefs">
+          <div class="pref-row"><div><div class="pt">Necessary</div><div class="pd">Sign-in state &amp; consent memory. Always on.</div></div><div class="switch"><input type="checkbox" checked disabled><div class="track"><div class="thumb"></div></div></div></div>
+          <div class="pref-row"><div><div class="pt">Preferences</div><div class="pd">Remember language &amp; theme defaults.</div></div><div class="switch"><input type="checkbox" id="pref-prefs" checked><div class="track"><div class="thumb"></div></div></div></div>
+          <div class="pref-row"><div><div class="pt">Analytics</div><div class="pd">Anonymous usage counts. Off by default.</div></div><div class="switch"><input type="checkbox" id="pref-anal"><div class="track"><div class="thumb"></div></div></div></div>
+        </div>
+        <div class="mv-links" style="margin-top:8px;">
+          <button class="mv-link" data-go="settings">&larr; Settings</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div class="toast-container" id="toast-root"></div>
+
+<script>
+(function(){
+  'use strict';
+
+  /* helpers */
+  function qs(s,c){return (c||document).querySelector(s);}
+  function qsa(s,c){return Array.prototype.slice.call((c||document).querySelectorAll(s));}
+  function toast(msg,type){
+    type=type||'success';
+    var root=document.getElementById('toast-root');
+    var t=document.createElement('div');
+    t.className='toast '+type;
+    t.innerHTML='<div class="tx">'+msg+'</div>';
+    root.appendChild(t);
+    setTimeout(function(){t.classList.add('out');setTimeout(function(){t.remove();},350);},3000);
+  }
+
+  /* modal state */
+  var currentView='signin';
+  var viewHistory=['signin'];
+  var views=['signin','signup','forgot-pass','forgot-user','settings','theme','font','lang','faq','tos','cookie'];
+  var stepMap={
+    signin:0,signup:1,forgot:2,'forgot-pass':2,'forgot-user':3,
+    settings:4,theme:5,font:6,lang:7,faq:8,tos:9,cookie:10
+  };
+  var viewTitles={
+    signin:'Sign in',signup:'Create handle','forgot-pass':'Reset password','forgot-user':'Forgot username',
+    settings:'Settings',theme:'Theme',font:'Font picker',lang:'Language',faq:'FAQ',tos:'Terms of Service',cookie:'Cookie Preferences'
+  };
+
+  var overlay=qs('#modal-overlay');
+  var container=qs('#modal-container');
+  var bodyEl=qs('#modal-body');
+  var titleEl=qs('#modal-title');
+  var iconEl=qs('#step-icon');
+  var stepsEl=qs('#modal-steps');
+  var closeBtn=qs('#modal-close');
+
+  /* canvas background */
+  var cvs=qs('#modal-canvas');
+  var ctx=cvs.getContext('2d');
+  function resizeCanvas(){
+    cvs.width=container.offsetWidth;
+    cvs.height=container.offsetHeight;
+  }
+  resizeCanvas();
+  var particles=[];
+  for(var i=0;i<30;i++){
+    particles.push({
+      x:Math.random(),y:Math.random(),
+      vx:(Math.random()-0.5)*0.004,vy:(Math.random()-0.5)*0.004,
+      r:Math.random()*2+1,o:Math.random()*0.4+0.1
+    });
+  }
+  function animCanvas(){
+    ctx.clearRect(0,0,cvs.width,cvs.height);
+    particles.forEach(function(p){
+      p.x+=p.vx;p.y+=p.vy;
+      if(p.x<0||p.x>1)p.vx*=-1;
+      if(p.y<0||p.y>1)p.vy*=-1;
+      ctx.beginPath();
+      ctx.arc(p.x*cvs.width,p.y*cvs.height,p.r,0,Math.PI*2);
+      ctx.fillStyle='rgba(242,169,59,'+p.o+')';
+      ctx.fill();
+    });
+    requestAnimationFrame(animCanvas);
+  }
+  animCanvas();
+
+  function renderSteps(view){
+    var idx=stepMap[view]||0;
+    var total=views.length;
+    stepsEl.innerHTML='';
+    for(var i=0;i<total;i++){
+      var d=document.createElement('div');
+      d.className='ms-dot'+(i<idx?' done':'')+(i===idx?' active':'');
+      stepsEl.appendChild(d);
+    }
+  }
+
+  function switchView(view){
+    var current=qs('.mv.active');
+    if(current){
+      current.classList.remove('active');
+      current.classList.add('out');
+      setTimeout(function(){current.classList.remove('out');},400);
+    }
+    var next=qs('[data-view="'+view+'"]');
+    if(next){
+      next.classList.add('active');
+      currentView=view;
+      titleEl.textContent=viewTitles[view]||view;
+      var idx=stepMap[view]||0;
+      iconEl.textContent=idx+1;
+      renderSteps(view);
+    }
+  }
+
+  function openModal(view){
+    overlay.classList.add('show');
+    viewHistory=[view||'signin'];
+    switchView(view||'signin');
+    resizeCanvas();
+    setTimeout(resizeCanvas,100);
+    document.body.style.overflow='hidden';
+  }
+
+  function closeModal(){
+    overlay.classList.remove('show');
+    document.body.style.overflow='';
+  }
+
+  /* event delegation */
+  overlay.addEventListener('click',function(e){
+    if(e.target===overlay)closeModal();
+  });
+  closeBtn.addEventListener('click',closeModal);
+
+  bodyEl.addEventListener('click',function(e){
+    var t=e.target.closest('[data-go]');
+    if(t){
+      var go=t.getAttribute('data-go');
+      viewHistory.push(currentView);
+      switchView(go);
+      return;
+    }
+    t=e.target.closest('[data-action]');
+    if(t){
+      var action=t.getAttribute('data-action');
+      simulateAction(action);
+      return;
+    }
+    t=e.target.closest('[data-theme]');
+    if(t){
+      qsa('[data-theme]').forEach(function(c){c.classList.remove('selected');});
+      t.classList.add('selected');
+      var theme=t.getAttribute('data-theme');
+      toast('Theme: '+theme);
+      return;
+    }
+    t=e.target.closest('[data-font]');
+    if(t){
+      qsa('[data-font]').forEach(function(c){c.classList.remove('selected');});
+      t.classList.add('selected');
+      var font=t.getAttribute('data-font');
+      toast('Font: '+font);
+      return;
+    }
+    t=e.target.closest('[data-lang]');
+    if(t){
+      qsa('[data-lang]').forEach(function(c){c.classList.remove('selected');});
+      t.classList.add('selected');
+      var lang=t.getAttribute('data-lang');
+      toast('Language: '+lang);
+      return;
+    }
+    t=e.target.closest('.mv-faq-item');
+    if(t){t.classList.toggle('open');}
+  });
+
+  function simulateAction(action){
+    switch(action){
+      case'signin':
+        var h=qs('#si-handle').value;
+        if(!h){toast('Enter a handle','error');return;}
+        toast('Welcome back, '+h+'!');
+        closeModal();
+        break;
+      case'signup':
+        var h2=qs('#su-handle').value;
+        if(!h2){toast('Choose a handle','error');return;}
+        toast('Handle created: '+h2+'!');
+        closeModal();
+        break;
+      case'forgot-pass':
+        toast('Reset link sent!');
+        viewHistory.push(currentView);
+        switchView('signin');
+        break;
+      case'forgot-user':
+        toast('Username sent to your email!');
+        viewHistory.push(currentView);
+        switchView('signin');
+        break;
+    }
+  }
+
+  /* nav button */
+  qs('#open-auth').addEventListener('click',function(){openModal('signin');});
+
+  /* pulse field */
+  (function(){
+    var field=document.getElementById('pulse-field');
+    var n=window.innerWidth<640?24:48;
+    for(var i=0;i<n;i++){
+      var d=document.createElement('div');
+      d.className='pulse-dot';
+      d.style.left=(Math.random()*100)+'%';
+      d.style.top=(Math.random()*100)+'%';
+      d.style.animationDelay=(Math.random()*4)+'s';
+      d.style.animationDuration=(3+Math.random()*3)+'s';
+      if(Math.random()<0.35)d.style.background='var(--accent)';
+      else if(Math.random()<0.25)d.style.background='var(--active)';
+      field.appendChild(d);
+    }
+  })();
+
+  /* form submit */
+  (function(){
+    var form=document.getElementById('join-form');
+    var status=document.getElementById('form-status');
+    form.addEventListener('submit',function(e){
+      e.preventDefault();
+      var action=form.getAttribute('action');
+      if(action.indexOf('YOUR_FORM_ID')!==-1){
+        status.textContent='Form endpoint not configured yet — see setup notes.';
+        status.className='form-status err';
+        return;
+      }
+      status.textContent='Sending…';
+      status.className='form-status';
+      fetch(action,{method:'POST',body:new FormData(form),headers:{'Accept':'application/json'}})
+      .then(function(res){
+        if(res.ok){status.textContent="Thanks — you're on the list. I'll be in touch.";status.className='form-status ok';form.reset();}
+        else{status.textContent='Something went wrong — please try again.';status.className='form-status err';}
+      })
+      .catch(function(){status.textContent='Network error — please try again.';status.className='form-status err';});
+    });
+  })();
+
+})();
+</script>
+</body>
+</html>
