@@ -1,0 +1,969 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>help — nostr peer network</title>
+  <meta name="description" content="help — nostr peer network. find help. give help. decentralized." />
+  <meta name="theme-color" content="#22c55e" />
+  <meta name="color-scheme" content="light dark" />
+  <meta property="og:title" content="help — nostr peer network" />
+  <meta property="og:description" content="find help. give help. decentralized." />
+  <meta property="og:type" content="website" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="help — nostr peer network" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' cdn.jsdelivr.net cdnjs.cloudflare.com unpkg.com cdn.tailwindcss.com; style-src 'self' 'unsafe-inline' cdn.jsdelivr.net cdnjs.cloudflare.com unpkg.com fonts.googleapis.com fonts.gstatic.com; font-src cdn.jsdelivr.net cdnjs.cloudflare.com fonts.gstatic.com fonts.googleapis.com; img-src 'self' data:; connect-src 'self' wss://* https:; frame-src 'self'; manifest-src 'self';" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%2322c55e'/><text x='50' y='68' font-size='55' font-family='Inter,sans-serif' font-weight='700' fill='white' text-anchor='middle'>h</text></svg>" />
+  <meta name="github-repo" content="help" />
+
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" />
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com" />
+  <link rel="preconnect" href="https://unpkg.com" />
+  <link rel="preconnect" href="https://cdn.tailwindcss.com" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="dns-prefetch" href="https://cdn.jsdelivr.net" />
+  <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com" />
+  <link rel="dns-prefetch" href="https://unpkg.com" />
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'], mono: ['JetBrains Mono', 'monospace'] },
+          colors: {
+            brand: { 50:'#f0fdf4',100:'#dcfce7',200:'#bbf7d0',300:'#86efac',400:'#4ade80',500:'#22c55e',600:'#16a34a',700:'#15803d',800:'#166534',900:'#14532d' },
+          },
+          animation: {
+            'fade-in': 'fadeIn 0.3s ease-out', 'slide-up': 'slideUp 0.3s ease-out', 'slide-down': 'slideDown 0.3s ease-out',
+            'scale-in': 'scaleIn 0.2s ease-out', 'bounce-in': 'bounceIn 0.5s ease-out', 'pulse-slow': 'pulse 3s infinite',
+            'spin-slow': 'spin 8s linear infinite', 'float': 'float 3s ease-in-out infinite', 'glow': 'glow 2s ease-in-out infinite alternate',
+          },
+          keyframes: {
+            fadeIn: { '0%':{opacity:'0'},'100%':{opacity:'1'} },
+            slideUp: { '0%':{opacity:'0',transform:'translateY(10px)'},'100%':{opacity:'1',transform:'translateY(0)'} },
+            slideDown: { '0%':{opacity:'0',transform:'translateY(-10px)'},'100%':{opacity:'1',transform:'translateY(0)'} },
+            scaleIn: { '0%':{opacity:'0',transform:'scale(0.95)'},'100%':{opacity:'1',transform:'scale(1)'} },
+            bounceIn: { '0%':{opacity:'0',transform:'scale(0.3)'},'50%':{transform:'scale(1.05)'},'70%':{transform:'scale(0.9)'},'100%':{opacity:'1',transform:'scale(1)'} },
+            float: { '0%,100%':{transform:'translateY(0px)'},'50%':{transform:'translateY(-10px)'} },
+            glow: { '0%':{boxShadow:'0 0 5px rgba(34,197,94,0.2)'},'100%':{boxShadow:'0 0 20px rgba(34,197,94,0.6)'} },
+          }
+        }
+      }
+    }
+  </script>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" media="print" onload="this.media='all'" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@4/fonts/remixicon.css" media="print" onload="this.media='all'" />
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" media="print" onload="this.media='all'" />
+  <link rel="stylesheet" href="https://unpkg.com/aos@2/dist/aos.css" media="print" onload="this.media='all'" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.css" media="print" onload="this.media='all'" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/shepherd.js@13/dist/css/shepherd.css" media="print" onload="this.media='all'" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/nprogress/0.2/nprogress.min.css" media="print" onload="this.media='all'" />
+
+  <style>
+    body { font-family: 'Inter', system-ui, sans-serif; }
+    .step-enter { animation: fadeIn 0.3s ease-out, slideUp 0.3s ease-out; }
+    .gradient-bg { background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 50%, #bbf7d0 100%); }
+    .dark .gradient-bg { background: linear-gradient(135deg, #0f172a 0%, #0c1f17 50%, #0a1f13 100%); }
+    .glass { backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); background: rgba(255,255,255,0.7); border: 1px solid rgba(255,255,255,0.3); }
+    .dark .glass { background: rgba(0,0,0,0.3); border-color: rgba(255,255,255,0.05); }
+    input, select, textarea { transition: border-color 0.2s, box-shadow 0.2s; }
+    input:focus, select:focus, textarea:focus { border-color: #22c55e !important; box-shadow: 0 0 0 3px rgba(34,197,94,0.15) !important; outline: none; }
+    .btn-primary { background-color: #22c55e; color: #fff; font-weight: 500; border-radius: 0.75rem; padding: 0.75rem 1.5rem; transition: all 0.2s; }
+    .btn-primary:hover { background-color: #16a34a; }
+    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-primary:focus { outline: 2px solid #4ade80; outline-offset: 2px; }
+    .btn-secondary { background-color: #f3f4f6; color: #374151; font-weight: 500; border-radius: 0.75rem; padding: 0.75rem 1.5rem; transition: all 0.2s; }
+    .btn-secondary:hover { background-color: #e5e7eb; }
+    .btn-secondary:focus { outline: 2px solid #d1d5db; outline-offset: 2px; }
+    .dark .btn-secondary { background-color: #374151; color: #e5e7eb; }
+    .dark .btn-secondary:hover { background-color: #4b5563; }
+    .input-field { width: 100%; border-radius: 0.75rem; border: 1px solid #e5e7eb; padding: 0.75rem 1rem; font-size: 0.875rem; background-color: rgba(255,255,255,0.8); }
+    .dark .input-field { background-color: rgba(31,41,55,0.8); border-color: #374151; color: #fff; }
+    .step-indicator { display: flex; align-items: center; justify-content: center; width: 2.5rem; height: 2.5rem; border-radius: 9999px; font-size: 0.875rem; font-weight: 700; transition: all 0.3s; }
+    .icon-btn { width: 2.25rem; height: 2.25rem; border-radius: 0.75rem; display: flex; align-items: center; justify-content: center; color: #9ca3af; transition: all 0.2s; }
+    .icon-btn:hover { background-color: #f3f4f6; }
+    .dark .icon-btn:hover { background-color: #1f2937; }
+    .icon-btn:focus { outline: 2px solid #4ade80; }
+
+    #cookie-bar { transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.16,1,0.3,1); }
+    #cookie-bar.show { transform: translateY(0); }
+    #kbd-overlay { opacity: 0; pointer-events: none; transition: opacity 0.2s; z-index: 999; }
+    #kbd-overlay.show { opacity: 1; pointer-events: auto; }
+
+    .shepherd-element { border-radius: 16px !important; }
+    .shepherd-content { border-radius: 16px !important; }
+    .shepherd-button { border-radius: 8px !important; padding: 8px 16px !important; font-weight: 500 !important; }
+    .shepherd-button-primary { background: #22c55e !important; }
+    .shepherd-button-secondary { background: #f3f4f6 !important; color: #374151 !important; }
+    .dark .shepherd-element { background: #1f2937 !important; color: #f3f4f6 !important; }
+    .dark .shepherd-text { color: #d1d5db !important; }
+    .dark .shepherd-button-secondary { background: #374151 !important; color: #e5e7eb !important; }
+
+    #nprogress .bar { background: #22c55e !important; height: 3px !important; }
+    #nprogress .peg { box-shadow: 0 0 10px #22c55e, 0 0 5px #22c55e !important; }
+
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 3px; }
+    .dark ::-webkit-scrollbar-thumb { background: #4b5563; }
+
+    .skip-link { position: absolute; top: -100%; left: 8px; padding: 8px 16px; background: #22c55e; color: #fff; border-radius: 8px; z-index: 9999; font-size: 14px; font-weight: 500; transition: top 0.2s; }
+    .skip-link:focus { top: 8px; }
+  </style>
+</head>
+<body>
+
+  <a href="#main-content" class="skip-link">skip to main content</a>
+
+  <div id="kbd-overlay" class="fixed inset-0 flex items-center justify-center bg-black/40 backdrop-blur-sm" role="dialog" aria-modal="true" aria-label="keyboard shortcuts" onclick="if(event.target===this)closeKbd()">
+    <div class="glass rounded-3xl p-6 max-w-sm mx-4 w-full dark:text-white">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="font-bold text-lg">keyboard shortcuts</h2>
+        <button onclick="closeKbd()" class="icon-btn" aria-label="close shortcuts"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="space-y-3 text-sm">
+        <div class="flex justify-between items-center"><span>toggle dark mode</span><kbd class="bg-gray-100 dark:bg-gray-800 px-2 py-0.5 rounded text-xs font-mono">Shift + D</kbd></div>
+        <div class="flex justify-between items-center"><span>show shortcuts</span><kbd class="bg-gray-100 dark:bg-gray-800 px-2 py-0.5 rounded text-xs font-mono">?</kbd></div>
+        <div class="flex justify-between items-center"><span>close overlay</span><kbd class="bg-gray-100 dark:bg-gray-800 px-2 py-0.5 rounded text-xs font-mono">Esc</kbd></div>
+        <div class="flex justify-between items-center"><span>sign out</span><kbd class="bg-gray-100 dark:bg-gray-800 px-2 py-0.5 rounded text-xs font-mono">Shift + S</kbd></div>
+        <div class="flex justify-between items-center"><span>start tour</span><kbd class="bg-gray-100 dark:bg-gray-800 px-2 py-0.5 rounded text-xs font-mono">Shift + T</kbd></div>
+        <div class="flex justify-between items-center"><span>focus search</span><kbd class="bg-gray-100 dark:bg-gray-800 px-2 py-0.5 rounded text-xs font-mono">/</kbd></div>
+      </div>
+      <p class="text-xs text-gray-400 mt-4 text-center">press <kbd class="bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 rounded text-xs font-mono">?</kbd> anytime to toggle</p>
+    </div>
+  </div>
+
+<div
+  x-data="app()"
+  x-init="init()"
+  class="min-h-screen gradient-bg dark:text-white transition-colors duration-300"
+  :class="{ 'dark': darkMode }"
+>
+
+  <div id="cookie-bar" class="fixed bottom-0 left-0 right-0 z-[999] glass border-t border-gray-200/50 dark:border-gray-700/50 px-4 py-3" role="alert">
+    <div class="max-w-4xl mx-auto flex items-center justify-between gap-4 flex-wrap">
+      <p class="text-xs text-gray-500 dark:text-gray-400"><i class="fa-regular fa-cookie-bite mr-1"></i>we use essential cookies for auth. no tracking. <a href="#" class="underline" tabindex="0">learn more</a></p>
+      <div class="flex gap-2">
+        <button onclick="this.closest('#cookie-bar').classList.remove('show')" class="text-xs text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 px-3 py-1.5 rounded-lg transition-colors">decline</button>
+        <button onclick="localStorage.setItem('help_cookie_consent','1');this.closest('#cookie-bar').classList.remove('show')" class="text-xs bg-brand-500 text-white px-4 py-1.5 rounded-lg hover:bg-brand-600 transition-colors font-medium">accept</button>
+      </div>
+    </div>
+  </div>
+
+  <header class="sticky top-0 z-40 glass border-b border-white/20 dark:border-gray-700/30" role="banner">
+    <div class="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between">
+      <div class="flex items-center gap-2.5">
+        <a href="/" class="flex items-center gap-2.5 no-underline" aria-label="help home">
+          <div class="w-8 h-8 rounded-xl bg-brand-500 flex items-center justify-center text-white text-sm font-bold shadow-sm">h</div>
+          <span class="font-semibold text-gray-800 dark:text-white tracking-tight" data-i18n="app.title">help</span>
+        </a>
+        <span class="text-xs text-gray-400 dark:text-gray-500 hidden sm:inline">&middot; <span data-i18n="app.subtitle">nostr peer network</span></span>
+      </div>
+      <div class="flex items-center gap-2">
+        <template x-if="signedIn">
+          <div class="hidden sm:flex items-center gap-1 mr-2">
+            <button @click="view='dashboard'" class="text-xs px-3 py-1.5 rounded-lg transition-colors font-medium" :class="view==='dashboard' ? 'bg-brand-100 dark:bg-brand-900/30 text-brand-700 dark:text-brand-400' : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'">dashboard</button>
+            <button @click="view='peers'" class="text-xs px-3 py-1.5 rounded-lg transition-colors font-medium" :class="view==='peers' ? 'bg-brand-100 dark:bg-brand-900/30 text-brand-700 dark:text-brand-400' : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'">peers</button>
+            <button @click="view='forum'" class="text-xs px-3 py-1.5 rounded-lg transition-colors font-medium" :class="view==='forum' ? 'bg-brand-100 dark:bg-brand-900/30 text-brand-700 dark:text-brand-400' : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'">forum</button>
+          </div>
+        </template>
+        <select @change="switchLang($event.target.value)" class="text-xs bg-transparent border border-gray-200 dark:border-gray-700 rounded-lg px-2 py-1 text-gray-500 dark:text-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-400" aria-label="select language">
+          <option value="en">🇬🇧 EN</option>
+          <option value="es">🇪🇸 ES</option>
+          <option value="fr">🇫🇷 FR</option>
+          <option value="de">🇩🇪 DE</option>
+          <option value="pt">🇧🇷 PT</option>
+        </select>
+        <button id="onboarding-trigger" @click="startTour()" class="icon-btn" title="take a tour (Shift+T)" aria-label="start onboarding tour">
+          <i class="fa-regular fa-circle-question"></i>
+        </button>
+        <button @click="darkMode = !darkMode; $nextTick(() => document.documentElement.classList.toggle('dark', darkMode))" class="icon-btn" :title="darkMode ? 'switch to light mode' : 'switch to dark mode'" :aria-label="darkMode ? 'switch to light mode' : 'switch to dark mode'">
+          <i class="fa-solid" :class="darkMode ? 'fa-sun' : 'fa-moon'"></i>
+        </button>
+        <template x-if="signedIn">
+          <div class="flex items-center gap-2 ml-1">
+            <span class="text-xs text-gray-400 dark:text-gray-500 hidden sm:inline font-mono" x-text="npubShort" title="your nostr public key"></span>
+            <button @click="signOut()" class="text-xs text-red-400 hover:text-red-500 font-medium transition-colors" aria-label="sign out">sign out</button>
+          </div>
+        </template>
+      </div>
+    </div>
+  </header>
+
+  <main id="main-content" class="max-w-5xl mx-auto px-4 py-8">
+
+    <template x-if="signedIn && view==='dashboard'">
+      <div class="mb-6 glass rounded-2xl p-4" data-aos="fade-up">
+        <div class="flex items-center justify-between mb-3">
+          <h3 class="text-sm font-semibold text-gray-600 dark:text-gray-300"><i class="fa-regular fa-chart-line mr-2 text-brand-500"></i>activity this week</h3>
+          <span class="text-xs text-gray-400">12 assists</span>
+        </div>
+        <canvas id="activityChart" class="w-full h-28" aria-label="weekly activity chart"></canvas>
+      </div>
+    </template>
+
+    <template x-if="signedIn && view==='dashboard'">
+      <div class="step-enter space-y-5">
+        <div class="glass rounded-3xl p-8 text-center space-y-4" data-aos="zoom-in">
+          <div class="w-16 h-16 rounded-full bg-brand-100 dark:bg-brand-900/40 flex items-center justify-center mx-auto ring-4 ring-brand-200 dark:ring-brand-800/50">
+            <i class="fa-solid fa-user text-2xl text-brand-600 dark:text-brand-400"></i>
+          </div>
+          <div>
+            <h2 class="text-xl font-bold" x-text="profile.name || 'helper'"></h2>
+            <p class="text-xs text-gray-400 font-mono mt-1" x-text="npubShort" title="your nostr public key"></p>
+          </div>
+          <div class="flex justify-center gap-4 text-xs text-gray-500 dark:text-gray-400 flex-wrap">
+            <span><i class="fa-regular fa-flag mr-1"></i><span x-text="profile.country || '—'"></span></span>
+            <span><i class="fa-regular fa-language mr-1"></i><span x-text="profile.language || '—'"></span></span>
+            <span><i class="fa-regular fa-clock mr-1"></i>active now</span>
+            <span><i class="fa-regular fa-star mr-1"></i>score: <span x-text="profile.score || '0'"></span></span>
+          </div>
+          <p class="text-sm text-gray-600 dark:text-gray-300" x-text="profile.about || 'ready to help'"></p>
+          <div class="flex gap-3 justify-center pt-2 flex-wrap">
+            <button class="btn-primary text-sm" @click="view='forum'"><i class="fa-regular fa-message mr-1.5"></i>browse help requests</button>
+            <button class="btn-secondary text-sm" @click="view='peers'"><i class="fa-regular fa-users mr-1.5"></i>find peers</button>
+          </div>
+        </div>
+
+        <div class="glass rounded-3xl p-6 text-center space-y-3" data-aos="fade-up" data-aos-delay="100">
+          <h3 class="text-sm font-semibold text-gray-600 dark:text-gray-300">your nostr public key</h3>
+          <div id="qrcode-container" class="flex justify-center"></div>
+          <p class="text-xs text-gray-400 font-mono break-all select-all" x-text="npubFull"></p>
+          <button @click="copyToClipboard(npubFull)" class="text-xs text-brand-500 hover:text-brand-600 font-medium transition-colors">
+            <i class="fa-regular" :class="copied ? 'fa-check' : 'fa-copy'"></i>
+            <span x-text="copied ? 'copied!' : 'copy npub'"></span>
+          </button>
+        </div>
+
+        <div class="grid grid-cols-3 gap-3" data-aos="fade-up" data-aos-delay="150">
+          <div class="glass rounded-2xl p-4 text-center">
+            <p class="text-2xl font-bold text-brand-500">3</p>
+            <p class="text-xs text-gray-400">helps given</p>
+          </div>
+          <div class="glass rounded-2xl p-4 text-center">
+            <p class="text-2xl font-bold text-brand-500">7</p>
+            <p class="text-xs text-gray-400">helps received</p>
+          </div>
+          <div class="glass rounded-2xl p-4 text-center">
+            <p class="text-2xl font-bold text-brand-500">12</p>
+            <p class="text-xs text-gray-400">connections</p>
+          </div>
+        </div>
+
+        <div class="glass rounded-3xl p-6" data-aos="fade-up" data-aos-delay="200">
+          <h3 class="text-sm font-semibold text-gray-600 dark:text-gray-300 mb-3"><i class="fa-regular fa-clock-rotate-left mr-2"></i>recent activity</h3>
+          <div class="space-y-2 text-sm">
+            <div class="flex items-center justify-between py-2 border-b border-gray-100 dark:border-gray-800 last:border-0">
+              <span class="text-gray-600 dark:text-gray-300">answered question about nostr relays</span>
+              <span class="text-xs text-gray-400">2h ago</span>
+            </div>
+            <div class="flex items-center justify-between py-2 border-b border-gray-100 dark:border-gray-800 last:border-0">
+              <span class="text-gray-600 dark:text-gray-300">helped @bob with key recovery</span>
+              <span class="text-xs text-gray-400">1d ago</span>
+            </div>
+            <div class="flex items-center justify-between py-2 last:border-0">
+              <span class="text-gray-600 dark:text-gray-300">posted a help request in #dev</span>
+              <span class="text-xs text-gray-400">3d ago</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </template>
+
+    <template x-if="signedIn && view==='peers'">
+      <div class="step-enter space-y-4">
+        <div class="flex items-center justify-between" data-aos="fade-up">
+          <h2 class="text-lg font-bold"><i class="fa-regular fa-users mr-2 text-brand-500"></i>active peers</h2>
+          <span class="text-xs text-gray-400">42 online</span>
+        </div>
+        <div class="relative" data-aos="fade-up" data-aos-delay="50">
+          <i class="fa-regular fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
+          <input type="text" x-model="peerSearch" placeholder="search by name, country, or language..." class="input-field pl-10" aria-label="search peers" />
+        </div>
+        <div class="grid gap-3">
+          <template x-for="peer in filteredPeers" :key="peer.npub">
+            <div class="glass rounded-2xl p-4 flex items-center gap-4 hover:border-brand-200 dark:hover:border-brand-800 transition-all duration-200 border border-transparent" data-aos="fade-up">
+              <div class="w-10 h-10 rounded-full bg-brand-100 dark:bg-brand-900/30 flex items-center justify-center text-brand-600 dark:text-brand-400 font-bold text-sm shrink-0" x-text="peer.name.charAt(0).toUpperCase()"></div>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2 flex-wrap">
+                  <p class="font-semibold text-sm text-gray-800 dark:text-white" x-text="peer.name"></p>
+                  <span class="text-xs" x-text="peer.countryFlag"></span>
+                  <span class="text-[10px] px-1.5 py-0.5 rounded-full" :class="peer.status==='online' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-500'" x-text="peer.status"></span>
+                </div>
+                <div class="flex items-center gap-2 text-xs text-gray-400 mt-0.5">
+                  <span><i class="fa-regular fa-language mr-0.5"></i><span x-text="peer.language"></span></span>
+                  <span><i class="fa-regular fa-star mr-0.5"></i>score: <span x-text="peer.score"></span></span>
+                  <span><i class="fa-regular fa-clock mr-0.5"></i><span x-text="peer.lastActive"></span></span>
+                </div>
+              </div>
+              <button @click="messagePeer(peer)" class="btn-primary text-xs px-4 py-2 shrink-0"><i class="fa-regular fa-paper-plane mr-1"></i>message</button>
+            </div>
+          </template>
+        </div>
+        <p x-show="filteredPeers.length === 0" class="text-center text-sm text-gray-400 py-8">no peers match your search</p>
+      </div>
+    </template>
+
+    <template x-if="signedIn && view==='forum'">
+      <div class="step-enter space-y-4">
+        <div class="flex items-center justify-between" data-aos="fade-up">
+          <h2 class="text-lg font-bold"><i class="fa-regular fa-message mr-2 text-brand-500"></i>help forum</h2>
+          <button @click="showNewPost = !showNewPost" class="btn-primary text-sm"><i class="fa-regular fa-plus mr-1.5"></i>new post</button>
+        </div>
+        <div x-show="showNewPost" class="step-enter glass rounded-3xl p-6 space-y-3" data-aos="fade-up">
+          <h3 class="font-semibold text-sm text-gray-700 dark:text-gray-200">create help request</h3>
+          <label for="post-title" class="sr-only">post title</label>
+          <input id="post-title" type="text" x-model="newPost.title" placeholder="title" class="input-field" maxlength="100" />
+          <label for="post-body" class="sr-only">post body</label>
+          <textarea id="post-body" x-model="newPost.body" placeholder="describe what you need help with (markdown supported)..." class="input-field" rows="4" maxlength="2000"></textarea>
+          <div class="flex items-center gap-2 text-xs text-gray-400">
+            <i class="fa-brands fa-markdown"></i>
+            <span>markdown formatting supported</span>
+          </div>
+          <div class="flex gap-3 pt-1">
+            <button @click="showNewPost=false" class="btn-secondary text-sm flex-1">cancel</button>
+            <button @click="submitPost()" :disabled="!newPost.title.trim()" class="btn-primary text-sm flex-1"><i class="fa-regular fa-paper-plane mr-1.5"></i>post</button>
+          </div>
+        </div>
+        <div class="flex gap-1 text-xs" data-aos="fade-up" data-aos-delay="50">
+          <button @click="forumFilter='recent'" class="px-3 py-1.5 rounded-lg transition-colors font-medium" :class="forumFilter==='recent' ? 'bg-brand-100 dark:bg-brand-900/30 text-brand-700 dark:text-brand-400' : 'text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800'">recent</button>
+          <button @click="forumFilter='top'" class="px-3 py-1.5 rounded-lg transition-colors font-medium" :class="forumFilter==='top' ? 'bg-brand-100 dark:bg-brand-900/30 text-brand-700 dark:text-brand-400' : 'text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800'">top</button>
+          <button @click="forumFilter='unanswered'" class="px-3 py-1.5 rounded-lg transition-colors font-medium" :class="forumFilter==='unanswered' ? 'bg-brand-100 dark:bg-brand-900/30 text-brand-700 dark:text-brand-400' : 'text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800'">unanswered</button>
+        </div>
+        <div class="space-y-3">
+          <template x-for="(post, i) in forumPosts" :key="i">
+            <div class="glass rounded-2xl p-5 transition-all duration-200 border border-transparent hover:border-brand-200 dark:hover:border-brand-800" data-aos="fade-up">
+              <div class="flex items-start gap-3">
+                <div class="w-8 h-8 rounded-full bg-brand-100 dark:bg-brand-900/30 flex items-center justify-center text-brand-600 dark:text-brand-400 font-bold text-xs shrink-0" x-text="post.author.charAt(0).toUpperCase()"></div>
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center gap-2 flex-wrap">
+                    <span class="font-semibold text-sm text-gray-800 dark:text-white" x-text="post.title"></span>
+                    <span class="text-[10px] px-1.5 py-0.5 rounded-full bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400" x-show="post.urgent">urgent</span>
+                  </div>
+                  <div class="text-xs text-gray-500 dark:text-gray-400 mt-1 flex items-center gap-2 flex-wrap">
+                    <span x-text="post.author"></span>
+                    <span>&middot;</span>
+                    <span x-text="post.time"></span>
+                    <span>&middot;</span>
+                    <span><i class="fa-regular fa-comment mr-0.5"></i><span x-text="post.replies"></span> replies</span>
+                  </div>
+                  <div class="text-sm text-gray-600 dark:text-gray-300 mt-2 prose prose-sm dark:prose-invert max-w-none" x-html="renderMarkdown(post.body)"></div>
+                </div>
+              </div>
+            </div>
+          </template>
+        </div>
+      </div>
+    </template>
+
+    <template x-if="!signedIn">
+      <div class="max-w-lg mx-auto">
+        <div class="flex items-center justify-center gap-2 mb-8" data-aos="fade-down">
+          <template x-for="(s, i) in totalSteps" :key="i">
+            <div class="flex items-center">
+              <div class="step-indicator" role="step" :aria-label="'step ' + (i+1)"
+                :class="i+1 === step ? 'bg-brand-500 text-white shadow-lg shadow-brand-200 dark:shadow-brand-900/30' : (i+1 < step ? 'bg-brand-100 text-brand-600 dark:bg-brand-900/30 dark:text-brand-400' : 'bg-gray-100 text-gray-400 dark:bg-gray-800 dark:text-gray-600')"
+                x-text="i+1"></div>
+              <div x-show="i+1 < totalSteps" class="w-8 h-0.5 mx-1 rounded" :class="i+1 < step ? 'bg-brand-400' : 'bg-gray-200 dark:bg-gray-700'"></div>
+            </div>
+          </template>
+        </div>
+
+        <div x-show="step === 1" class="step-enter space-y-4">
+          <div class="text-center mb-6" data-aos="fade-up">
+            <h1 class="text-2xl font-bold text-gray-800 dark:text-white">welcome to help</h1>
+            <p class="text-sm text-gray-400 mt-1">decentralized peer support on nostr</p>
+          </div>
+          <div class="grid gap-3">
+            <button @click="step=2; authMode='register'; generateKeys()" class="glass hover:bg-brand-50 dark:hover:bg-brand-900/20 rounded-2xl p-5 text-left transition-all duration-200 group border border-transparent hover:border-brand-200 dark:hover:border-brand-800">
+              <div class="flex items-center gap-4">
+                <div class="w-12 h-12 rounded-xl bg-brand-100 dark:bg-brand-900/30 flex items-center justify-center text-brand-600 dark:text-brand-400 group-hover:scale-110 transition-transform"><i class="fa-solid fa-user-plus text-lg"></i></div>
+                <div><p class="font-semibold text-gray-800 dark:text-white">create account</p><p class="text-xs text-gray-400 mt-0.5">generate your nostr keys & join the network</p></div>
+                <i class="fa-solid fa-chevron-right ml-auto text-gray-300 dark:text-gray-600"></i>
+              </div>
+            </button>
+            <button @click="step=2; authMode='signin'" class="glass hover:bg-brand-50 dark:hover:bg-brand-900/20 rounded-2xl p-5 text-left transition-all duration-200 group border border-transparent hover:border-brand-200 dark:hover:border-brand-800">
+              <div class="flex items-center gap-4">
+                <div class="w-12 h-12 rounded-xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400 group-hover:scale-110 transition-transform"><i class="fa-solid fa-arrow-right-to-bracket text-lg"></i></div>
+                <div><p class="font-semibold text-gray-800 dark:text-white">sign in</p><p class="text-xs text-gray-400 mt-0.5">use existing nostr key or browser extension</p></div>
+                <i class="fa-solid fa-chevron-right ml-auto text-gray-300 dark:text-gray-600"></i>
+              </div>
+            </button>
+            <button @click="step=2; authMode='recover'" class="glass hover:bg-brand-50 dark:hover:bg-brand-900/20 rounded-2xl p-5 text-left transition-all duration-200 group border border-transparent hover:border-brand-200 dark:hover:border-brand-800">
+              <div class="flex items-center gap-4">
+                <div class="w-12 h-12 rounded-xl bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center text-amber-600 dark:text-amber-400 group-hover:scale-110 transition-transform"><i class="fa-solid fa-key text-lg"></i></div>
+                <div><p class="font-semibold text-gray-800 dark:text-white">recover account</p><p class="text-xs text-gray-400 mt-0.5">restore from private key or backup phrase</p></div>
+                <i class="fa-solid fa-chevron-right ml-auto text-gray-300 dark:text-gray-600"></i>
+              </div>
+            </button>
+            <div class="relative my-2">
+              <div class="border-t border-gray-100 dark:border-gray-800"></div>
+              <span class="absolute inset-0 flex items-center justify-center text-xs text-gray-400 bg-transparent px-3"><span class="bg-white dark:bg-gray-900 px-2">or</span></span>
+            </div>
+            <button @click="socialSignIn()" class="glass hover:bg-purple-50 dark:hover:bg-purple-900/20 rounded-2xl p-5 text-left transition-all duration-200 group border border-transparent hover:border-purple-200 dark:hover:border-purple-800">
+              <div class="flex items-center gap-4">
+                <div class="w-12 h-12 rounded-xl bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center text-purple-600 dark:text-purple-400 group-hover:scale-110 transition-transform"><i class="fa-solid fa-globe text-lg"></i></div>
+                <div><p class="font-semibold text-gray-800 dark:text-white">social sign in</p><p class="text-xs text-gray-400 mt-0.5">connect with NIP-07 extension (Alby, nos2x, etc)</p></div>
+                <i class="fa-solid fa-chevron-right ml-auto text-gray-300 dark:text-gray-600"></i>
+              </div>
+            </button>
+          </div>
+        </div>
+
+        <div x-show="step === 2" class="step-enter space-y-5">
+          <template x-if="authMode === 'register'">
+            <div class="glass rounded-3xl p-6 space-y-4" data-aos="fade-up">
+              <div class="flex items-center gap-3 mb-1">
+                <div class="w-10 h-10 rounded-xl bg-brand-100 dark:bg-brand-900/30 flex items-center justify-center text-brand-600 dark:text-brand-400"><i class="fa-solid fa-user-plus"></i></div>
+                <div><h3 class="font-semibold text-gray-800 dark:text-white">create account</h3><p class="text-xs text-gray-400">your keys, your identity — generated locally</p></div>
+              </div>
+              <div class="space-y-3">
+                <div><label class="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1.5 block" for="reg-name">display name</label><input id="reg-name" type="text" x-model="form.name" placeholder="alice" class="input-field" maxlength="30" _="on input if my.value.length >= 2 remove @disabled from #reg-btn else add @disabled to #reg-btn" /></div>
+                <div><label class="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1.5 block" for="reg-about">about</label><textarea id="reg-about" x-model="form.about" placeholder="i'm here to help..." class="input-field" rows="2" maxlength="160"></textarea></div>
+                <div class="grid grid-cols-2 gap-3">
+                  <div><label class="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1.5 block" for="reg-country">country</label>
+                    <select id="reg-country" x-model="form.country" class="input-field">
+                      <option value="">select</option><option value="US">🇺🇸 US</option><option value="GB">🇬🇧 GB</option><option value="DE">🇩🇪 DE</option><option value="FR">🇫🇷 FR</option><option value="JP">🇯🇵 JP</option><option value="BR">🇧🇷 BR</option><option value="IN">🇮🇳 IN</option><option value="NG">🇳🇬 NG</option><option value="KE">🇰🇪 KE</option><option value="AU">🇦🇺 AU</option><option value="CA">🇨🇦 CA</option><option value="MX">🇲🇽 MX</option><option value="AR">🇦🇷 AR</option><option value="ZA">🇿🇦 ZA</option><option value="KR">🇰🇷 KR</option>
+                    </select>
+                  </div>
+                  <div><label class="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1.5 block" for="reg-lang">language</label>
+                    <select id="reg-lang" x-model="form.language" class="input-field">
+                      <option value="">select</option><option value="en">🇬🇧 english</option><option value="es">🇪🇸 español</option><option value="fr">🇫🇷 français</option><option value="de">🇩🇪 deutsch</option><option value="ja">🇯🇵 日本語</option><option value="pt">🇧🇷 português</option><option value="hi">🇮🇳 हिन्दी</option><option value="ko">🇰🇷 한국어</option><option value="zh">🇨🇳 中文</option><option value="ar">🇸🇦 العربية</option><option value="ru">🇷🇺 русский</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+              <div class="bg-gray-50 dark:bg-gray-800/50 rounded-xl p-3 space-y-2">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-medium text-gray-500 dark:text-gray-400"><i class="fa-regular fa-key mr-1"></i>your nostr public key</span>
+                  <button @click="copyToClipboard(form.npub)" class="text-xs text-brand-500 hover:text-brand-600 transition-colors" aria-label="copy public key"><i class="fa-regular" :class="copied ? 'fa-check' : 'fa-copy'"></i></button>
+                </div>
+                <p class="text-[11px] font-mono text-gray-500 dark:text-gray-400 break-all bg-white dark:bg-gray-900/50 rounded-lg p-2 select-all" x-text="form.npub || 'generating...'"></p>
+                <div x-show="showPrivkeyWarning" class="flex items-start gap-2 text-[11px] text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/20 rounded-lg p-2">
+                  <i class="fa-solid fa-triangle-exclamation mt-0.5"></i>
+                  <span>backup your private key! it's stored locally only. <button @click="showPrivkey = !showPrivkey" class="underline font-medium" x-text="showPrivkey ? 'hide' : 'show'" aria-label="toggle private key visibility"></button></span>
+                </div>
+                <div x-show="showPrivkey" class="text-[11px] font-mono text-gray-400 break-all bg-white dark:bg-gray-900/50 rounded-lg p-2 select-all" x-text="form.nsec"></div>
+              </div>
+              <div class="flex items-start gap-3">
+                <input type="checkbox" x-model="form.agree" id="agree" class="mt-1 rounded border-gray-300 text-brand-500 focus:ring-brand-400" />
+                <label for="agree" class="text-xs text-gray-400 dark:text-gray-500">i understand that my keys are my responsibility. i have backed up my private key.</label>
+              </div>
+              <div class="flex gap-3 pt-1">
+                <button @click="step=1; clearForm()" class="btn-secondary text-sm flex-1">back</button>
+                <button id="reg-btn" @click="completeRegistration()" :disabled="!form.agree || !form.name" class="btn-primary text-sm flex-1"><i class="fa-regular fa-check mr-1.5"></i>create account</button>
+              </div>
+            </div>
+          </template>
+
+          <template x-if="authMode === 'signin'">
+            <div class="glass rounded-3xl p-6 space-y-4" data-aos="fade-up">
+              <div class="flex items-center gap-3 mb-1">
+                <div class="w-10 h-10 rounded-xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400"><i class="fa-solid fa-arrow-right-to-bracket"></i></div>
+                <div><h3 class="font-semibold text-gray-800 dark:text-white">sign in</h3><p class="text-xs text-gray-400">paste your nsec or use a browser extension</p></div>
+              </div>
+              <div class="space-y-3">
+                <div><label class="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1.5 block" for="signin-nsec">private key (nsec)</label><input id="signin-nsec" type="password" x-model="form.nsecInput" placeholder="nsec1..." class="input-field font-mono text-xs" /></div>
+                <button @click="signInWithKey()" :disabled="!form.nsecInput" class="btn-primary text-sm w-full"><i class="fa-regular fa-key mr-1.5"></i>sign in with key</button>
+              </div>
+              <div class="relative"><div class="border-t border-gray-100 dark:border-gray-800"></div><span class="absolute inset-0 flex items-center justify-center text-xs text-gray-400"><span class="bg-white dark:bg-gray-900 px-2">or</span></span></div>
+              <button @click="signInWithExtension()" class="w-full glass border border-purple-200 dark:border-purple-800/50 hover:bg-purple-50 dark:hover:bg-purple-900/20 rounded-2xl p-4 text-left transition-all duration-200 group">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 rounded-lg bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center text-purple-500 group-hover:scale-110 transition-transform"><i class="fa-solid fa-plug"></i></div>
+                  <div><p class="font-semibold text-sm text-gray-800 dark:text-white">NIP-07 extension</p><p class="text-xs text-gray-400">connect with Alby, nos2x, or similar</p></div>
+                  <i class="fa-solid fa-chevron-right ml-auto text-gray-300 dark:text-gray-600"></i>
+                </div>
+              </button>
+              <div class="flex gap-3 pt-1"><button @click="step=1; clearForm()" class="btn-secondary text-sm flex-1">back</button></div>
+            </div>
+          </template>
+
+          <template x-if="authMode === 'recover'">
+            <div class="glass rounded-3xl p-6 space-y-4" data-aos="fade-up">
+              <div class="flex items-center gap-3 mb-1">
+                <div class="w-10 h-10 rounded-xl bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center text-amber-600 dark:text-amber-400"><i class="fa-solid fa-key"></i></div>
+                <div><h3 class="font-semibold text-gray-800 dark:text-white">recover account</h3><p class="text-xs text-gray-400">restore with your private key</p></div>
+              </div>
+              <div class="space-y-3">
+                <div><label class="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1.5 block" for="recover-key">private key (nsec)</label><input id="recover-key" type="password" x-model="form.recoverKey" placeholder="nsec1..." class="input-field font-mono text-xs" /></div>
+                <button @click="recoverAccount()" :disabled="!form.recoverKey" class="btn-primary text-sm w-full"><i class="fa-regular fa-rotate-left mr-1.5"></i>recover</button>
+              </div>
+              <div class="text-center text-xs text-gray-400 py-2"><i class="fa-regular fa-circle-info mr-1"></i>lost your key? without it, the account cannot be recovered — nostr is self-sovereign.</div>
+              <div class="flex gap-3 pt-1"><button @click="step=1; clearForm()" class="btn-secondary text-sm flex-1">back</button></div>
+            </div>
+          </template>
+        </div>
+
+        <div x-show="step === 3" class="step-enter">
+          <div class="glass rounded-3xl p-6 space-y-5 text-center" data-aos="fade-up">
+            <div class="w-14 h-14 rounded-full bg-brand-100 dark:bg-brand-900/30 flex items-center justify-center mx-auto"><i class="fa-solid fa-shield-halved text-2xl text-brand-600 dark:text-brand-400"></i></div>
+            <div><h3 class="font-semibold text-gray-800 dark:text-white">verify your identity</h3><p class="text-xs text-gray-400 mt-1">enter the 6-digit code sent to your extension</p></div>
+            <div class="flex justify-center gap-2" role="group" aria-label="one-time password input">
+              <template x-for="(_, i) in 6" :key="i">
+                <input type="text" inputmode="numeric" maxlength="1" x-model="otp[i]" @input="otpInput(i, $event)" @keydown.backspace="otpBack(i, $event)"
+                  class="w-11 h-12 text-center text-lg font-bold rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-800/80 focus:border-brand-400 focus:ring-2 focus:ring-brand-200 dark:focus:ring-brand-800 outline-none transition-all"
+                  :class="otp[i] ? 'border-brand-400 bg-brand-50 dark:bg-brand-900/20' : ''" :aria-label="'digit ' + (i+1)" />
+              </template>
+            </div>
+            <div class="flex gap-3 pt-2">
+              <button @click="step=2" class="btn-secondary text-sm flex-1">back</button>
+              <button @click="verifyOtp()" :disabled="otp.join('').length !== 6" class="btn-primary text-sm flex-1"><i class="fa-regular fa-circle-check mr-1.5"></i>verify</button>
+            </div>
+            <p class="text-xs text-gray-400">didn't receive a code? <button @click="step=4" class="text-brand-500 hover:text-brand-600 font-medium underline">try alternative</button></p>
+          </div>
+        </div>
+
+        <div x-show="step === 4" class="step-enter">
+          <div class="glass rounded-3xl p-6 space-y-4" data-aos="fade-up">
+            <div class="flex items-center gap-3 mb-1">
+              <div class="w-10 h-10 rounded-xl bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center text-purple-600 dark:text-purple-400"><i class="fa-solid fa-globe"></i></div>
+              <div><h3 class="font-semibold text-gray-800 dark:text-white">social sign in</h3><p class="text-xs text-gray-400">connect with a nostr browser extension</p></div>
+            </div>
+            <div class="space-y-3">
+              <button @click="signInWithExtension()" class="w-full glass hover:bg-purple-50 dark:hover:bg-purple-900/20 rounded-2xl p-4 text-left transition-all duration-200 group border border-purple-100 dark:border-purple-900/30">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 rounded-lg bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center text-purple-500 group-hover:scale-110 transition-transform"><i class="fa-solid fa-bolt"></i></div>
+                  <div><p class="font-semibold text-sm text-gray-800 dark:text-white">Alby</p><p class="text-xs text-gray-400">bitcoin & nostr lightning extension</p></div>
+                </div>
+              </button>
+              <button @click="signInWithExtension()" class="w-full glass hover:bg-purple-50 dark:hover:bg-purple-900/20 rounded-2xl p-4 text-left transition-all duration-200 group border border-purple-100 dark:border-purple-900/30">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 rounded-lg bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center text-purple-500 group-hover:scale-110 transition-transform"><i class="fa-solid fa-n"></i></div>
+                  <div><p class="font-semibold text-sm text-gray-800 dark:text-white">nos2x</p><p class="text-xs text-gray-400">nostr signer extension</p></div>
+                </div>
+              </button>
+              <button @click="signInWithExtension()" class="w-full glass hover:bg-purple-50 dark:hover:bg-purple-900/20 rounded-2xl p-4 text-left transition-all duration-200 group border border-purple-100 dark:border-purple-900/30">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 rounded-lg bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center text-purple-500 group-hover:scale-110 transition-transform"><i class="fa-solid fa-fingerprint"></i></div>
+                  <div><p class="font-semibold text-sm text-gray-800 dark:text-white">other NIP-07</p><p class="text-xs text-gray-400">any compliant nostr signer</p></div>
+                </div>
+              </button>
+            </div>
+            <div class="relative"><div class="border-t border-gray-100 dark:border-gray-800"></div><span class="absolute inset-0 flex items-center justify-center text-xs text-gray-400"><span class="bg-white dark:bg-gray-900 px-2">or go back</span></span></div>
+            <div class="flex gap-3"><button @click="step=1" class="btn-secondary text-sm flex-1">back to start</button></div>
+          </div>
+        </div>
+      </div>
+    </template>
+
+    <p class="text-center text-[11px] text-gray-300 dark:text-gray-700 mt-10">
+      powered by nostr &middot; keys are stored locally in your browser &middot; <a href="https://nostr.com" target="_blank" rel="noopener noreferrer" class="underline hover:text-brand-400 transition-colors">learn more</a>
+    </p>
+  </main>
+</div>
+
+<!-- CDN SCRIPTS -->
+<script src="https://cdn.jsdelivr.net/npm/htmx.org@2/dist/htmx.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/htmx-ext-response-targets@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/htmx-ext-class-tools@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/htmx-ext-preload@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/htmx-ext-loading-states@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/htmx-ext-remove-me@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/htmx-ext-alpine-morph@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/htmx-ext-multi-swap@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/idiomorph@0/dist/idiomorph.min.js"></script>
+<script src="https://unpkg.com/hyperscript.org@0.9"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3/dist/cdn.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/persist@3/dist/cdn.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/focus@3/dist/cdn.min.js"></script>
+<script defer src="https://unpkg.com/nostr-tools@2/lib/nostr.bundle.min.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12/gsap.min.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12/ScrollTrigger.min.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12/SplitText.min.js"></script>
+<script defer src="https://unpkg.com/aos@2/dist/aos.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/i18next@23/dist/umd/i18next.min.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.4/purify.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/shepherd.js@13/dist/js/shepherd.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0/qrcode.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/marked@12/lib/marked.umd.min.js"></script>
+
+<script>
+const i18nResources = {
+  en: { translation: { 'app.title':'help','app.subtitle':'nostr peer network' } },
+  es: { translation: { 'app.title':'ayuda','app.subtitle':'red de pares nostr' } },
+  fr: { translation: { 'app.title':'aide','app.subtitle':'reseau pair a pair nostr' } },
+  de: { translation: { 'app.title':'hilfe','app.subtitle':'nostr peer-netzwerk' } },
+  pt: { translation: { 'app.title':'ajuda','app.subtitle':'rede de pares nostr' } },
+};
+
+function applyI18n(lang) {
+  const t = i18nResources[lang]?.translation || i18nResources.en.translation;
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    if (t[key]) el.textContent = t[key];
+  });
+}
+
+function toggleKbd() { document.getElementById('kbd-overlay').classList.toggle('show'); }
+function closeKbd() { document.getElementById('kbd-overlay').classList.remove('show'); }
+
+let notyfInstance = null;
+function getNotyf() {
+  if (!notyfInstance && typeof Notyf !== 'undefined') {
+    notyfInstance = new Notyf({ duration: 3000, position: { x:'right', y:'bottom' }, ripple: false });
+  }
+  return notyfInstance;
+}
+function showNotyf(msg, type) {
+  if (type === undefined) type = 'success';
+  const n = getNotyf();
+  if (n) { (type === 'error' ? n.error(msg) : n.success(msg)); return; }
+  const el = document.createElement('div');
+  el.className = 'fixed bottom-6 right-6 z-50 px-5 py-3 rounded-2xl shadow-lg text-sm font-medium animate-fade-in ' + (type === 'error' ? 'bg-red-500 text-white' : 'bg-gray-900 dark:bg-white dark:text-gray-900 text-white');
+  el.textContent = msg;
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 3000);
+}
+
+const samplePeers = [
+  { name:'Alice', countryFlag:'🇦🇺', language:'en', status:'online', score:42, lastActive:'now', npub:'npub1alice...' },
+  { name:'Bob', countryFlag:'🇺🇸', language:'en', status:'online', score:28, lastActive:'5m ago', npub:'npub1bob...' },
+  { name:'Carlos', countryFlag:'🇪🇸', language:'es', status:'away', score:15, lastActive:'1h ago', npub:'npub1carlos...' },
+  { name:'Diana', countryFlag:'🇩🇪', language:'de', status:'online', score:37, lastActive:'now', npub:'npub1diana...' },
+  { name:'Elena', countryFlag:'🇰🇷', language:'ko', status:'offline', score:22, lastActive:'2d ago', npub:'npub1elena...' },
+  { name:'Felix', countryFlag:'🇫🇷', language:'fr', status:'online', score:55, lastActive:'now', npub:'npub1felix...' },
+];
+const samplePosts = [
+  { title:'How to connect to custom relays?', author:'Alice', body:'I am trying to connect to **my own relay** but keep getting connection errors. Has anyone set up a custom relay before?\n\n```\nwss://myrelay.example.com\n```\n\nAny tips?', time:'2h ago', replies:3, urgent:false },
+  { title:'Lost my nsec \u2014 any recovery options?', author:'Bob', body:'I know the answer is probably "no" since nostr is self-sovereign, but I wanted to ask anyway. Is there _any_ way to recover an account without the private key?', time:'5h ago', replies:7, urgent:true },
+  { title:'Looking for devs to review my NIP proposal', author:'Carlos', body:'I wrote a NIP for **community tagging**. Would love some feedback before submitting. The gist:\n\n- New kind `30050` for community definitions\n- Tags for moderators and rules\n\nThoughts?', time:'1d ago', replies:12, urgent:false },
+];
+
+document.addEventListener('alpine:init', () => {
+  Alpine.data('app', () => ({
+    darkMode: false,
+    step: 1,
+    totalSteps: 4,
+    authMode: 'register',
+    signedIn: false,
+    showPrivkey: false,
+    showPrivkeyWarning: false,
+    copied: false,
+    npubShort: '',
+    npubFull: '',
+    otp: ['','','','','',''],
+    view: 'dashboard',
+    peerSearch: '',
+    showNewPost: false,
+    forumFilter: 'recent',
+
+    profile: { name: '', about: '', country: '', language: '', score: 0 },
+    form: { name: '', about: '', country: '', language: '', agree: false, npub: '', nsec: '', nsecInput: '', recoverKey: '' },
+    newPost: { title: '', body: '' },
+    _privkey: '',
+    _pubkey: '',
+
+    get filteredPeers() {
+      const q = this.peerSearch.toLowerCase();
+      if (!q) return samplePeers;
+      return samplePeers.filter(p =>
+        p.name.toLowerCase().includes(q) ||
+        p.language.toLowerCase().includes(q) ||
+        p.countryFlag.includes(q)
+      );
+    },
+
+    get forumPosts() {
+      return samplePosts;
+    },
+
+    init() {
+      const stored = localStorage.getItem('help_nostr_session');
+      if (stored) {
+        try {
+          const d = JSON.parse(stored);
+          this._privkey = d.privkey;
+          this._pubkey = d.pubkey;
+          this.profile = d.profile || {};
+          this.signedIn = true;
+          this.deriveNpub();
+        } catch(e) { localStorage.removeItem('help_nostr_session'); }
+      }
+      if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        this.darkMode = true;
+        document.documentElement.classList.add('dark');
+      }
+      if (!localStorage.getItem('help_cookie_consent')) {
+        setTimeout(() => {
+          const el = document.getElementById('cookie-bar');
+          if (el) el.classList.add('show');
+        }, 500);
+      }
+      if (typeof AOS !== 'undefined') AOS.init({ duration: 400, once: true });
+      if (!localStorage.getItem('help_tour_done') && typeof Shepherd !== 'undefined') {
+        setTimeout(() => this.startTour(), 1500);
+        localStorage.setItem('help_tour_done', '1');
+      }
+      document.addEventListener('keydown', (e) => {
+        if (e.key === '?' && !e.shiftKey && !e.ctrlKey && !e.metaKey && !e.altKey) {
+          toggleKbd();
+        }
+        if (e.key === 'Escape') {
+          closeKbd();
+        }
+        if (e.shiftKey && e.key === 'D') {
+          e.preventDefault();
+          this.darkMode = !this.darkMode;
+          document.documentElement.classList.toggle('dark', this.darkMode);
+        }
+        if (e.shiftKey && e.key === 'S' && this.signedIn) {
+          e.preventDefault();
+          this.signOut();
+        }
+        if (e.shiftKey && e.key === 'T') {
+          e.preventDefault();
+          this.startTour();
+        }
+        if (e.key === '/' && !['INPUT','TEXTAREA'].includes(e.target.tagName)) {
+          e.preventDefault();
+          const inp = document.querySelector('[aria-label="search peers"]');
+          if (inp) inp.focus();
+        }
+      });
+    },
+
+    switchLang(lang) {
+      localStorage.setItem('help_lang', lang);
+      if (typeof i18next !== 'undefined') {
+        i18next.changeLanguage(lang, () => applyI18n(lang));
+      } else {
+        applyI18n(lang);
+      }
+    },
+
+    generateKeys() {
+      if (typeof NostrTools === 'undefined') return;
+      try {
+        const sk = NostrTools.generateSecretKey();
+        const pk = NostrTools.getPublicKey(sk);
+        this._privkey = sk;
+        this._pubkey = pk;
+        this.form.nsec = NostrTools.nip19.nsecEncode(sk);
+        this.form.npub = NostrTools.nip19.npubEncode(pk);
+        this.showPrivkeyWarning = true;
+      } catch(e) { showNotyf('nostr tools not loaded', 'error'); }
+    },
+
+    deriveNpub() {
+      if (typeof NostrTools === 'undefined' || !this._pubkey) { this.npubShort='...'; this.npubFull='...'; return; }
+      try {
+        this.npubFull = NostrTools.nip19.npubEncode(this._pubkey);
+        this.npubShort = this.npubFull.slice(0,12)+'...'+this.npubFull.slice(-6);
+      } catch(e) { this.npubShort='...'; this.npubFull='...'; }
+    },
+
+    completeRegistration() {
+      if (!this.form.agree || !this.form.name) return;
+      if (!this._privkey) this.generateKeys();
+      if (!this._privkey) return;
+      this.profile = { name: this.form.name, about: this.form.about||'', country: this.form.country||'', language: this.form.language||'', score: 0, pubkey: this._pubkey };
+      this.saveSession();
+      this.deriveNpub();
+      this.step = 3;
+      showNotyf('account created! verify to continue');
+    },
+
+    signInWithKey() {
+      const nsec = this.form.nsecInput.trim();
+      try {
+        let sk = nsec.startsWith('nsec1') ? NostrTools.nip19.decode(nsec).data : nsec;
+        this._privkey = sk;
+        this._pubkey = NostrTools.getPublicKey(sk);
+        this.profile = { name:'nostr user', about:'', country:'', language:'', score:0, pubkey:this._pubkey };
+        this.saveSession(); this.deriveNpub();
+        this.signedIn = true; this.step = 1;
+        showNotyf('signed in successfully!');
+        this.$nextTick(() => { this.initChart(); this.initQR(); });
+      } catch(e) { showNotyf('invalid private key', 'error'); }
+    },
+
+    async signInWithExtension() {
+      if (!window.nostr) { showNotyf('no NIP-07 extension found. install Alby or nos2x', 'error'); return; }
+      try {
+        const pk = await window.nostr.getPublicKey();
+        this._pubkey = pk; this._privkey = '';
+        this.profile = { name:'nostr user (extension)', about:'', country:'', language:'', score:0, pubkey:pk };
+        this.saveSession(); this.deriveNpub();
+        this.signedIn = true; this.step = 1;
+        showNotyf('connected with extension!');
+        this.$nextTick(() => { this.initChart(); this.initQR(); });
+      } catch(e) { showNotyf('extension rejected connection', 'error'); }
+    },
+
+    recoverAccount() { this.form.nsecInput = this.form.recoverKey; this.signInWithKey(); },
+    socialSignIn() { window.nostr ? this.signInWithExtension() : (this.step = 4); },
+
+    otpInput(index, event) {
+      const val = event.target.value;
+      if (val && index < 5) {
+        const c = event.target.closest('.flex');
+        if (c) { const inputs = c.querySelectorAll('input'); if (inputs[index+1]) inputs[index+1].focus(); }
+      }
+    },
+    otpBack(index, event) {
+      if (!this.otp[index] && index > 0) {
+        const c = event.target.closest('.flex');
+        if (c) { const inputs = c.querySelectorAll('input'); if (inputs[index-1]) inputs[index-1].focus(); }
+      }
+    },
+    verifyOtp() {
+      if (this.otp.join('').length === 6) {
+        this.signedIn = true; this.step = 1;
+        showNotyf('verified! welcome to help network');
+        this.$nextTick(() => { this.initChart(); this.initQR(); });
+      }
+    },
+
+    saveSession() {
+      localStorage.setItem('help_nostr_session', JSON.stringify({ privkey:this._privkey, pubkey:this._pubkey, profile:this.profile }));
+    },
+    signOut() {
+      localStorage.removeItem('help_nostr_session');
+      this.signedIn = false; this.step = 1;
+      this._privkey=''; this._pubkey='';
+      this.profile = { name:'', about:'', country:'', language:'', score:0 };
+      this.clearForm();
+      showNotyf('signed out');
+    },
+    clearForm() {
+      this.form = { name:'', about:'', country:'', language:'', agree:false, npub:'', nsec:'', nsecInput:'', recoverKey:'' };
+      this.otp = ['','','','','',''];
+      this.showPrivkey = false; this.showPrivkeyWarning = false;
+      this._privkey=''; this._pubkey='';
+    },
+
+    copyToClipboard(text) {
+      navigator.clipboard.writeText(text).then(() => {
+        this.copied = true; showNotyf('copied to clipboard');
+        setTimeout(() => this.copied = false, 2000);
+      }).catch(() => {
+        const ta = document.createElement('textarea');
+        ta.value = text; document.body.appendChild(ta);
+        ta.select(); document.execCommand('copy');
+        document.body.removeChild(ta);
+        this.copied = true; showNotyf('copied to clipboard');
+        setTimeout(() => this.copied = false, 2000);
+      });
+    },
+
+    renderMarkdown(text) {
+      if (!text) return '';
+      let html = text;
+      if (typeof marked !== 'undefined') {
+        try { html = marked.parse(text); } catch(e) {}
+      }
+      if (typeof DOMPurify !== 'undefined') {
+        html = DOMPurify.sanitize(html);
+      }
+      return html;
+    },
+
+    submitPost() {
+      if (!this.newPost.title.trim()) return;
+      samplePosts.unshift({
+        title: this.newPost.title,
+        author: this.profile.name || 'anonymous',
+        body: this.newPost.body || '_no details_',
+        time: 'just now',
+        replies: 0,
+        urgent: false
+      });
+      this.newPost = { title: '', body: '' };
+      this.showNewPost = false;
+      showNotyf('post created!');
+    },
+
+    messagePeer(peer) {
+      showNotyf('messaging ' + peer.name + '... (demo)');
+    },
+
+    initChart() {
+      if (typeof Chart === 'undefined') return;
+      const ctx = document.getElementById('activityChart');
+      if (!ctx) return;
+      new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],
+          datasets: [{
+            label: 'help activities',
+            data: [3,7,4,9,6,12,8],
+            borderColor: '#22c55e',
+            backgroundColor: 'rgba(34,197,94,0.1)',
+            fill: true,
+            tension: 0.4,
+            pointRadius: 3,
+            borderWidth: 2
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            x: { grid: { display: false }, ticks: { font: { size: 10 }, color: '#9ca3af' } },
+            y: { grid: { color: 'rgba(0,0,0,0.05)' }, ticks: { font: { size: 10 }, color: '#9ca3af' } }
+          }
+        }
+      });
+    },
+
+    initQR() {
+      if (typeof QRCode === 'undefined' || !this.npubFull) return;
+      const container = document.getElementById('qrcode-container');
+      if (!container || container.hasChildNodes()) return;
+      try {
+        new QRCode(container, { text: this.npubFull, width: 120, height: 120, colorDark: '#22c55e', colorLight: '#ffffff' });
+      } catch(e) {}
+    },
+
+    startTour() {
+      if (typeof Shepherd === 'undefined') { showNotyf('onboarding not available offline', 'error'); return; }
+      const tour = new Shepherd.Tour({
+        defaultStepOptions: {
+          scrollTo: { behavior:'smooth', block:'center' },
+          cancelIcon: { enabled: true },
+          classes: 'shadow-xl rounded-2xl'
+        }
+      });
+      tour.addStep({ id:'welcome', title:'👋 welcome to help', text:'This is a nostr-powered peer network. Let us walk you through the basics.', buttons: [{ text:'next', action:tour.next, classes:'shepherd-button-primary' }] });
+      tour.addStep({ id:'auth', title:'📋 multi-step auth', text:'Choose to create an account, sign in, recover, or connect a browser extension.', attachTo: { element:'.grid > button:first-child', on:'bottom' }, buttons: [{ text:'back', action:tour.back, classes:'shepherd-button-secondary' }, { text:'next', action:tour.next, classes:'shepherd-button-primary' }] });
+      tour.addStep({ id:'keys', title:'🔑 your keys', text:'Your Nostr keypair is generated locally. Only you control it — no servers involved.', attachTo: { element:'.grid > button:nth-child(2)', on:'bottom' }, buttons: [{ text:'back', action:tour.back, classes:'shepherd-button-secondary' }, { text:'next', action:tour.next, classes:'shepherd-button-primary' }] });
+      tour.addStep({ id:'social', title:'🔌 NIP-07 extensions', text:'Have Alby or nos2x? Use social sign in to connect your existing Nostr identity.', attachTo: { element:'.grid > button:last-child', on:'top' }, buttons: [{ text:'back', action:tour.back, classes:'shepherd-button-secondary' }, { text:'finish', action:tour.complete, classes:'shepherd-button-primary' }] });
+      tour.start();
+    }
+  }));
+});
+
+htmx.config.defaultSettleDelay = 50;
+htmx.config.globalViewTransitions = true;
+
+document.addEventListener('DOMContentLoaded', () => {
+  if (typeof i18next !== 'undefined') {
+    i18next.init({
+      lng: localStorage.getItem('help_lang') || navigator.language.split('-')[0] || 'en',
+      fallbackLng: 'en',
+      resources: i18nResources
+    }, () => applyI18n(i18next.language));
+  }
+  if (typeof gsap !== 'undefined') {
+    gsap.from('header', { y: -20, opacity: 0, duration: 0.4, ease: 'power2.out' });
+  }
+});
+</script>
+
+
+</body>
+</html>
