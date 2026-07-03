@@ -1,45 +1,61 @@
-# Task Plan: SvelteKit SSR → Netlify
+# Task Plan: Professional SvelteKit Rebuild
 
 ## Goal
-Convert monolithic CDN-HTML app into a proper SvelteKit SSR app deployed on Netlify, with simulated live peer interactions and a polished design.
+Transform the "help" Nostr peer network from its current broken state into a professional, working SvelteKit SSR application by rebuilding from scratch with proper architecture.
 
 ## Acceptance Criteria
-1. `npm run dev` starts a working dev server
-2. Nostr auth flow works (register, sign in, recover, OTP, NIP-07)
-3. Dashboard shows profile, QR code, activity chart, recent activity
-4. Peers page shows simulated online users with live activity updates
-5. Forum page has posts with markdown rendering
-6. Dark mode + i18n (EN/ES/FR/DE/PT) work
-7. `npm run build` succeeds
-8. Deploy to Netlify works
+1. [ ] All pages render correctly (no blank page, no 404)
+2. [ ] i18n language picker changes all UI text in real-time (5 languages)
+3. [ ] Peer simulation runs in a Web Worker (true concurrent thread)
+4. [ ] Professional design matching idea.md: green palette, glassmorphism, Inter font
+5. [ ] Dark mode works consistently
+6. [ ] Mobile bottom nav works
+7. [ ] Auth flow works (register, sign in, recover, OTP, NIP-07)
+8. [ ] Dashboard renders QR code + Chart.js chart + stats + activity
+9. [ ] Forum with Markdown rendering works
+10. [ ] Keyboard shortcuts work
+11. [ ] Cookie consent works
+12. [ ] Clean `npm run build` passes
 
 ## Phases
 
-### Phase 1: Scaffold SvelteKit + Tailwind ✅
-- `npm create svelte@latest` with skeleton, TypeScript, ESLint
-- Add Tailwind CSS via PostCSS
-- Configure brand colors and animations
-
-### Phase 2: Core Layout + Auth Pages ✅
-- Layout with header, dark mode toggle, lang switcher, nav
-- Auth flow: welcome page with 4 action cards
-- Register form with Nostr key generation
-- Sign-in with nsec or NIP-07 extension
-- Recovery form
-- OTP verification step
-
-### Phase 3: Dashboard + Peers + Forum ✅
-- Dashboard: profile card, QR code, stats, activity chart, recent activity
-- Peers: searchable list with simulated online/offline/live activity
-- Forum: post listing, new post form with markdown, filter tabs
-
-### Phase 4: Simulated Live Interactions ✅
-- Store with setInterval generating fake peer activity
-- Activity feed updates every 5-10 seconds
-- Peer status changes (online/away/offline cycling)
-
-### Phase 5: Polish + Deploy ✅
-- 404 page
+### Phase 1: Scaffold Clean Project ✅ (already have basic project)
+### Phase 2: Rebuild i18n System
+- Simplify translations to use a single reactive map
+- Apply `$t('key')` to every text node in all templates
+- Fix lang store to properly persist and react
+### Phase 3: Add Web Worker Peer Simulation
+- Create `src/lib/workers/peerSimulation.ts`
+- Use Vite's `?worker` import
+- Post messages to main thread every 2-3s for each peer
+- 10+ daemon peers with complex status cycling patterns
+### Phase 4: Rebuild UI Components
+- Auth flow with proper styling
+- Dashboard with working Chart.js + QR code
+- Peer list with search + live status from Worker
+- Forum with Markdown rendering
+- Cookie consent
+- Keyboard shortcuts
+- Mobile bottom nav
+### Phase 5: Fix Design & Polish
+- idea.md brand identity: green palette, glassmorphism
+- Proper dark mode with system preference detection
+- Responsive layout
 - PWA manifest
-- Netlify config (`netlify.toml`)
-- Build and verify
+- Smooth transitions
+### Phase 6: Verify & Deploy
+- `npm run build` passes
+- Deploy to Netlify
+- Verify all features work
+
+## Known Issues from Current Codebase
+1. i18n: translations defined but NEVER used in templates (all English hardcoded)
+2. Layout uses `$darkMode` (Svelte 4 syntax) but runs in Svelte 5 runes mode
+3. Peer simulation on main thread (not concurrent)
+4. Chart.js imported dynamically but error handling missing
+5. QR code renders after timeout (race condition)
+6. Cookie consent uses unsupported `{#if typeof window}` pattern in SSR
+7. CSP meta tag missing from layout
+8. No proper error boundaries
+9. `bind:value` with Svelte 5 requires `$state()` variables (mostly correct)
+10. `bind:this={chartCanvas}` requires `$state()` (correctly done but initialization timing is fragile)
